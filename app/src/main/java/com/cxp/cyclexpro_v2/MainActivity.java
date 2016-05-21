@@ -15,7 +15,7 @@ public class MainActivity extends TitleBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        this.tvTitle.setText("Cycle X Pro");
+        this.tvTitle.setText("Cycle-X Pro");
 
         Button solobtn = (Button) findViewById(R.id.solobtn);
         Button trainbtn = (Button) findViewById(R.id.trainbtn);

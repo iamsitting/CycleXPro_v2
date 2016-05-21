@@ -25,14 +25,16 @@
             android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="25sp"
+            android:textSize="28sp"
+            android:textColor="#FFF"
+            android:gravity="center_vertical"
             android:layout_alignParentStart="true"/>
 
         <Button
             android:id="@+id/conbtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Connect"
+            android:background="@drawable/ic_bluetooth_off_grey600_36dp"
             android:layout_alignParentEnd="true"/>
 
         </RelativeLayout>
