@@ -9,13 +9,12 @@
     tools:context="com.cxp.cyclexpro_v2.MetricsActivity"
     android:weightSum="100">
 
-    <com.jjoe64.graphview.helper.GraphViewXML
+    <com.jjoe64.graphview.GraphView
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
-        android:id="@+id/Graph"
+        android:id="@+id/graph"
         android:orientation="horizontal"
         android:layout_weight="20"
-        app:seriesData="0=5;1=8"
         app:seriesType="line"
         app:seriesColor="#00cc00"
         android:title="Acceleration"/>
@@ -56,6 +55,14 @@
             android:text="Controls"
             android:textSize="15dp"
             android:textColor="#FFF"/>
+        <ToggleButton
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textOff="Start Stream"
+            android:textOn="Stop Stream"
+            android:checked="false"
+            android:id="@+id/tbStream"/>
     </LinearLayout>
 
 </LinearLayout>

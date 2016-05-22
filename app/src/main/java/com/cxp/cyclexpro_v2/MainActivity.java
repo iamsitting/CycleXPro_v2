@@ -47,5 +47,14 @@ public class MainActivity extends TitleBarActivity {
                 startActivity(intent);
             }
         });
+
+        //conbtn listener
+        conbtn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Intent intent = new Intent(MainActivity.this, BluetoothActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }
