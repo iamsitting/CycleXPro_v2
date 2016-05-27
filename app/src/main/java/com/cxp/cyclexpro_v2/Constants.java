@@ -25,35 +25,19 @@
  */
 package com.cxp.cyclexpro_v2;
 
-import android.app.Activity;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.view.Window;
-import android.widget.Button;
-import android.widget.TextView;
+import java.util.UUID;
 
-/**
- * TitleBarActivity is a superclass; used with extends
- * Creates a custom title bar for the app.
- */
-public class TitleBarActivity extends Activity {
-    protected Button conbtn;
-    protected TextView tvTitle;
+public final class Constants {
 
-    /** creates title bar with button and textView */
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-
-        setContentView(R.layout.activity_title_bar);
-
-        getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
-                R.layout.title_bar);
-
-        conbtn = (Button) findViewById(R.id.conbtn);
-        tvTitle = (TextView) findViewById(R.id.tvTitle);
+    private Constants(){
+        //restrict instantiation
     }
+
+    protected static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    protected static final int SUCCESS_CONNECT = 0;
+    protected static final int MESSAGE_READ = 1;
+
+    protected static final String START_STREAM = "E";
+    protected static final String STOP_STREAM = "Q";
 }

@@ -1,3 +1,29 @@
+/*
+ * Copyright (C) 2016 Carlos Salamanca (@iamsitting)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
+ * and associated documentation files (the "Software"), to deal in the Software without restriction,
+ * including without limitation the rights to use, copy modify, merge publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
+ * so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all copies or
+ * substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTIBILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+ * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+ * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+ * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ *
+ */
+
+/*
+ * @author Carlos Salamanca
+ * @version 2.0.0
+ */
+
 package com.cxp.cyclexpro_v2;
 
 import android.app.Activity;
@@ -9,6 +35,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,27 +46,28 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * This activity manages the Bluetooth Connection.
+ */
+
 public class BluetoothActivity extends Activity implements AdapterView.OnItemClickListener {
 
+    /** calls the connectedThread.cancel method */
     public static void disconnect(){
-        if(connectedThread != null){
-            connectedThread.cancel();
-            connectedThread=null;
+        if(sConnectedThread != null){
+            sConnectedThread.cancel();
+            sConnectedThread=null;
         }
     }
 
-    static ConnectedThread connectedThread;
-    public static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
-    protected static final int SUCCESS_CONNECT = 0;
-    protected static final int MESSAGE_READ = 1;
+    static ConnectedThread sConnectedThread;
+
     ListView listView;
     ArrayAdapter<String> listAdapter;
     static BluetoothAdapter btAdapter;
@@ -66,16 +94,19 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         }
     }
 
+    /** Puts Bluetooth in Discovery Mode */
     private void startDiscovery(){
         btAdapter.cancelDiscovery();
         btAdapter.startDiscovery();
     }
 
+    /** Enables Bluetooth */
     private void turnOnBT(){
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(intent, 1);
     }
 
+    /** list of BT devices to list of paired devices */
     private void getPairedDevices(){
         devicesArray = btAdapter.getBondedDevices();
         if(devicesArray.size() > 0){
@@ -87,6 +118,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         listAdapter.notifyDataSetChanged();
     }
 
+    /** Initializes Views and Adapter */
     private void init(){
         listView = (ListView) findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
@@ -99,6 +131,8 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         Log.i("Check", "BT init");
 
         receiver = new BroadcastReceiver() {
+
+            /** Finds and generates a list of Bluetooth devices */
             @Override
             public void onReceive(Context context, Intent intent) {
                 String action = intent.getAction();
@@ -136,6 +170,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         filter.addAction(BluetoothDevice.ACTION_UUID);
         registerReceiver(receiver, filter);
         Log.i("Check", "End init()");
+
     }
 
     @Override
@@ -144,6 +179,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         unregisterReceiver(receiver);
     }
 
+    /** If connection is cancelled, Toast tells user to turn on BT */
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_CANCELED){
@@ -152,6 +188,10 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         }
     }
 
+    /**
+     * @param arg2  the index of the chosen paired device
+     * paired device is passed to the ConnectThread
+     */
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3){
         Log.i("Check", "onItemClick");
@@ -170,6 +210,9 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         }
     }
 
+    /**
+     * Initializes the Bluetooth socket and creates the connection
+     */
     private class ConnectThread extends Thread {
         private BluetoothSocket mmSocket;
         private final BluetoothDevice mmDevice;
@@ -184,8 +227,8 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             fallback = false;
 
             try {
-                if (secure) tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-                else tmp = device.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+                if (secure) tmp = mmDevice.createRfcommSocketToServiceRecord(Constants.MY_UUID);
+                else tmp = mmDevice.createInsecureRfcommSocketToServiceRecord(Constants.MY_UUID);
 
                 Log.i("Check", "create rfcommsocket");
             } catch(IOException e){
@@ -194,6 +237,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             mmSocket = tmp;
         }
 
+        /** Attempts to establish a Bluetooth connection */
         public void run(){
             btAdapter.cancelDiscovery();
 
@@ -202,8 +246,31 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                 Log.i("Check", "socket connected");
             } catch (IOException connectException){
                 Log.e("ConnectThread", "connect IOException: ", connectException);
+                //added
+                try{
+                    Log.i("Check", "trying fallback");
+                    if (mmDevice == null) Log.i("Check", "Device is null");
+                    Log.i("Check", mmDevice.getName());
+                    mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,1);
+                    if (mmSocket == null) Log.i("Check", "Socket is null");
+                    mmSocket.connect();
+
+                    //mmSocket = (BluetoothSocket) mmDevice.getClass()
+                    //        .getMethod("createRfcommSocket",
+                    //               new Class[] {int.class})
+                    //        .invoke(mmDevice, 1);
+                    //mmSocket.connect();
+
+                    Log.i("Check", "Successful Connection ONE!");
+
+                } catch (Exception e2){
+                    Log.e("No FBConnection", "e2", e2);
+
+                }
+                //added
             }
-            Log.i("Check", "trying fallback");
+            if (mmSocket.isConnected()) Log.i("Check", "Successful Connection TWO!");
+            /*Log.i("Check", "trying fallback");
             String sec;
             if (secure) sec = "";
             else sec = "Insecure";
@@ -223,22 +290,28 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                     break;
                 } catch (NoSuchMethodException | InvocationTargetException |
                         IllegalAccessException ex){
-                    Log.e("ConnectThread", "Exception: ", ex);
+                    Log.e("FBConnectThread", "Exception: ", ex);
                 } catch (IOException ex) {
-                    Log.e("ConnectThread", "IOException: ", ex);
+                    Log.e("FBConnectThread", "IOException: ", ex);
                     try{
                         mmSocket.close();
                     } catch (IOException e){}
                 }
-            }
+            }*/
             if (fallback) {
-                MetricsActivity.mHandler.obtainMessage(SUCCESS_CONNECT, fbsocket).sendToTarget();
+                MainActivity.sHandler
+                        .obtainMessage(Constants.SUCCESS_CONNECT, mmSocket)
+                        .sendToTarget();
                 Log.i("Check", "connected to fallback");
             } else {
-                MetricsActivity.mHandler.obtainMessage(SUCCESS_CONNECT, mmSocket).sendToTarget();
+                if (mmSocket == null) Log.i("Check", "Socket is null");
+                MainActivity.sHandler
+                        .obtainMessage(Constants.SUCCESS_CONNECT, mmSocket)
+                        .sendToTarget();
             }
         }
 
+        /** Cancels the Bluetooth connection */
         public void cancel(){
             try{
                 if (fallback) fbsocket.close();
@@ -246,6 +319,10 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             } catch (IOException e) {}
         }
     }
+
+    /**
+     * Maintains the connection, writes, and reads
+     */
     static class ConnectedThread extends Thread {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
@@ -265,6 +342,10 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             mmOutStream = tmpOut;
         }
 
+        /**
+         * Reads bytes from Bluetooth socket
+         * Passes messages to the Handler
+         */
         public void run(){
             byte[] buffer;
             int bytes;
@@ -278,7 +359,8 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                     }
                     buffer = new byte[1024];
                     bytes = mmInStream.read(buffer);
-                    MetricsActivity.mHandler.obtainMessage(MESSAGE_READ, bytes, -1, buffer)
+                    MainActivity.sHandler
+                            .obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
                 } catch (IOException e){
                     break;
@@ -286,6 +368,8 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             }
         }
 
+        /** Writes string to Bluetooth socket
+         * @param income    message is sent as string */
         public void write(String income){
             try{
                 mmOutStream.write(income.getBytes());
@@ -297,6 +381,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             } catch (IOException e) {}
         }
 
+        /** Closes Bluetooth socket */
         public void cancel(){
             try{
                 mmSocket.close();
