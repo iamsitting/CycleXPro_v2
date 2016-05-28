@@ -35,7 +35,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,9 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * This activity manages the Bluetooth Connection.
@@ -57,20 +54,11 @@ import java.util.UUID;
 
 public class BluetoothActivity extends Activity implements AdapterView.OnItemClickListener {
 
-    /** calls the connectedThread.cancel method */
-    public static void disconnect(){
-        if(sConnectedThread != null){
-            sConnectedThread.cancel();
-            sConnectedThread=null;
-        }
-    }
-
-
     static ConnectedThread sConnectedThread;
 
     ListView listView;
     ArrayAdapter<String> listAdapter;
-    static BluetoothAdapter btAdapter;
+    static BluetoothAdapter sBtAdapter;
     Set<BluetoothDevice> devicesArray;
     ArrayList<String> pairedDevices;
     ArrayList<BluetoothDevice> devices;
@@ -82,11 +70,11 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
         init();
-        if(btAdapter == null){
+        if(sBtAdapter == null){
             Toast.makeText(getApplicationContext(), "No BT detected", Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            if(!btAdapter.isEnabled()){
+            if(!sBtAdapter.isEnabled()){
                 turnOnBT();
             }
             getPairedDevices();
@@ -96,8 +84,8 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
 
     /** Puts Bluetooth in Discovery Mode */
     private void startDiscovery(){
-        btAdapter.cancelDiscovery();
-        btAdapter.startDiscovery();
+        sBtAdapter.cancelDiscovery();
+        sBtAdapter.startDiscovery();
     }
 
     /** Enables Bluetooth */
@@ -108,7 +96,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
 
     /** list of BT devices to list of paired devices */
     private void getPairedDevices(){
-        devicesArray = btAdapter.getBondedDevices();
+        devicesArray = sBtAdapter.getBondedDevices();
         if(devicesArray.size() > 0){
             for(BluetoothDevice device:devicesArray){
                 Log.i("Check", device.getName());
@@ -118,16 +106,18 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         listAdapter.notifyDataSetChanged();
     }
 
+
+
     /** Initializes Views and Adapter */
     private void init(){
         listView = (ListView) findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
-        listAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, 0);
+        listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, 0);
         listView.setAdapter(listAdapter);
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
-        pairedDevices = new ArrayList<String>();
+        sBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        pairedDevices = new ArrayList<>();
         filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        devices = new ArrayList<BluetoothDevice>();
+        devices = new ArrayList<>();
         Log.i("Check", "BT init");
 
         receiver = new BroadcastReceiver() {
@@ -157,7 +147,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                 } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
 
                 } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)){
-                    if(btAdapter.getState() == btAdapter.STATE_OFF){
+                    if(sBtAdapter.getState() == sBtAdapter.STATE_OFF){
                         turnOnBT();
                     }
                 }
@@ -195,8 +185,8 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
     @Override
     public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3){
         Log.i("Check", "onItemClick");
-        if(btAdapter.isDiscovering()){
-            btAdapter.cancelDiscovery();
+        if(sBtAdapter.isDiscovering()){
+            sBtAdapter.cancelDiscovery();
             Log.i("Check", "Discovery is cancelled");
         }
         if(listAdapter.getItem(arg2).contains("(Paired)")){
@@ -218,7 +208,6 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         private final BluetoothDevice mmDevice;
         private final boolean secure;
         private boolean fallback;
-        private BluetoothSocket fbsocket;
 
         public ConnectThread(BluetoothDevice device){
             BluetoothSocket tmp = null;
@@ -239,27 +228,20 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
 
         /** Attempts to establish a Bluetooth connection */
         public void run(){
-            btAdapter.cancelDiscovery();
+            sBtAdapter.cancelDiscovery();
 
             try{
+                //for some reason, it sometimes doesn't work
                 mmSocket.connect();
                 Log.i("Check", "socket connected");
             } catch (IOException connectException){
                 Log.e("ConnectThread", "connect IOException: ", connectException);
                 //added
                 try{
-                    Log.i("Check", "trying fallback");
-                    if (mmDevice == null) Log.i("Check", "Device is null");
-                    Log.i("Check", mmDevice.getName());
-                    mmSocket =(BluetoothSocket) mmDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mmDevice,1);
-                    if (mmSocket == null) Log.i("Check", "Socket is null");
+                    mmSocket = (BluetoothSocket) mmDevice.getClass()
+                            .getMethod("createRfcommSocket", new Class[] {int.class})
+                            .invoke(mmDevice,1);
                     mmSocket.connect();
-
-                    //mmSocket = (BluetoothSocket) mmDevice.getClass()
-                    //        .getMethod("createRfcommSocket",
-                    //               new Class[] {int.class})
-                    //        .invoke(mmDevice, 1);
-                    //mmSocket.connect();
 
                     Log.i("Check", "Successful Connection ONE!");
 
@@ -267,37 +249,9 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                     Log.e("No FBConnection", "e2", e2);
 
                 }
-                //added
             }
             if (mmSocket.isConnected()) Log.i("Check", "Successful Connection TWO!");
-            /*Log.i("Check", "trying fallback");
-            String sec;
-            if (secure) sec = "";
-            else sec = "Insecure";
 
-            for(Integer port = 1; port <= 5; port++){
-                try{
-                    btAdapter.cancelDiscovery();
-                    Class<?> clazz = mmSocket.getRemoteDevice().getClass();
-                    Class<?>[] paramTypes = new Class<?>[]{Integer.TYPE};
-                    Method m = clazz.getMethod("create"+sec+"RfcommSocket",
-                            paramTypes);
-                    Object[] params = new Object[]{Integer.valueOf(port)};
-                    fbsocket = (BluetoothSocket) m.invoke(mmSocket.getRemoteDevice(), params);
-                    fbsocket.connect();
-                    Log.i("Check", "Connection");
-                    fallback = true;
-                    break;
-                } catch (NoSuchMethodException | InvocationTargetException |
-                        IllegalAccessException ex){
-                    Log.e("FBConnectThread", "Exception: ", ex);
-                } catch (IOException ex) {
-                    Log.e("FBConnectThread", "IOException: ", ex);
-                    try{
-                        mmSocket.close();
-                    } catch (IOException e){}
-                }
-            }*/
             if (fallback) {
                 MainActivity.sHandler
                         .obtainMessage(Constants.SUCCESS_CONNECT, mmSocket)
@@ -314,7 +268,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         /** Cancels the Bluetooth connection */
         public void cancel(){
             try{
-                if (fallback) fbsocket.close();
+                if (fallback) mmSocket.close();
                 else mmSocket.close();
             } catch (IOException e) {}
         }
@@ -358,7 +312,9 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                         e.printStackTrace();
                     }
                     buffer = new byte[1024];
+                    Log.i("Read", "Checking...");
                     bytes = mmInStream.read(buffer);
+                    Log.i("Read", "Checked");
                     MainActivity.sHandler
                             .obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
@@ -369,10 +325,12 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         }
 
         /** Writes string to Bluetooth socket
-         * @param income    message is sent as string */
+         * @param income    message is a string
+         * string is converted to byte array */
         public void write(String income){
+            byte [] data = income.getBytes();
             try{
-                mmOutStream.write(income.getBytes());
+                mmOutStream.write(data,0, data.length);
                 try{
                     Thread.sleep(20);
                 } catch (InterruptedException e){
@@ -386,6 +344,14 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             try{
                 mmSocket.close();
             } catch (IOException e){}
+        }
+    }
+
+    /** calls the connectedThread.cancel method */
+    public static void disconnect(){
+        if(sConnectedThread != null){
+            sConnectedThread.cancel();
+            sConnectedThread=null;
         }
     }
 }

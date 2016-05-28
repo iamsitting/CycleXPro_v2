@@ -51,6 +51,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         init();
     }
 
+    /** initializes the Views*/
     void init(){
         this.tvTitle.setText("Cycle-X Pro");
         conbtn.setOnClickListener(this);
@@ -93,12 +94,16 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         startActivity(intent);
     }
 
+    /**
+     * A custom interface for handler
+     */
     public class CustomHandler extends Handler {
 
         public CustomHandler() {
             //In case we need to pass objects to the Handler
         }
 
+        /** Parses the Handler message */
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 

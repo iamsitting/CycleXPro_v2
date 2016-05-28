@@ -38,6 +38,6 @@ public final class Constants {
     protected static final int SUCCESS_CONNECT = 0;
     protected static final int MESSAGE_READ = 1;
 
-    protected static final String START_STREAM = "E";
-    protected static final String STOP_STREAM = "Q";
+    protected static final String START_STREAM = "E\n";
+    protected static final String STOP_STREAM = "Q\n";
 }

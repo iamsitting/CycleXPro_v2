@@ -1,4 +1,8 @@
 /*
+ * This file is licensed under MIT
+ *
+ * The MIT License (MIT)
+ *
  * Copyright (C) 2016 Carlos Salamanca (@iamsitting)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -26,131 +30,54 @@
 
 package com.cxp.cyclexpro_v2;
 
-import android.app.Activity;
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.os.Handler;
-import android.os.Message;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutCompat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.jjoe64.graphview.series.Series;
-
-import java.lang.ref.WeakReference;
 
 /**
  * This activity presents data
  * Uses GraphView to plot data
  */
 public class MetricsActivity extends TitleBarActivity implements View.OnClickListener{
-    //public static CustomHandler sHandler;
-    public static Handler mHandler;
-
-    static final LineGraphSeries<DataPoint> mSeries =
-            new LineGraphSeries<>(new DataPoint[]{});
 
     ToggleButton tbStream;
+    static TextView tvSpeed;
 
     //Declare some variables
-    static boolean AutoScrollX, Lock;
-
-
-    private static double graph2LastXValue = 0;
-    private static int Xview = 10;
+    static boolean autoScrollX;
+    private static double graph2LastXValue = 5d;
     private static int maxPoints = 40;
 
-
-
-/*
-    protected static Handler mHandler = new Handler(){
-
-        */
-/*
-
-        @Override
-        public void handleMessage(Message msg){
-            super.handleMessage(msg);
-            Log.i("msg.what", Integer.toString(msg.what));
-            switch (msg.what){
-                case Constants.SUCCESS_CONNECT:
-                    Log.i("Check", "SUCCESS_CONNECT");
-                    BluetoothActivity.sConnectedThread =
-                            new BluetoothActivity.ConnectedThread((BluetoothSocket)msg.obj);
-                    Toast.makeText(getApplicationContext,
-                            "Connected!", Toast.LENGTH_SHORT).show();
-                    Log.i("Check", "TOASTED");
-                    BluetoothActivity.sConnectedThread.start();
-                    break;
-                case Constants.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    String strIncom = new String(readBuf, 0, 5);
-
-                    if(strIncom.indexOf('s')==0 && strIncom.indexOf('.')==2){
-                        strIncom = strIncom.replace("s", "");
-                        if(isFloatNumber(strIncom)){
-                            mSeries.appendData(new DataPoint(graph2LastXValue,
-                                    Double.parseDouble(strIncom)), AutoScrollX, maxPoints);
-                            if (graph2LastXValue >= Xview && Lock == true){
-                                mSeries.resetData(new DataPoint[] {});
-                                graph2LastXValue = 0;
-                            } else {
-                                graph2LastXValue += 1;
-                            }
-
-                        }
-                    }
-                    break;
-                default:
-                    Log.i("check", "Default case");
-                    Log.i("msg.what", Integer.toString(msg.what));
-            }
-        }
-
-
-
-        public boolean isFloatNumber(String num){
-            try{
-                Double.parseDouble(num);
-            } catch (NumberFormatException nfe){
-               return false;
-            }
-            return true;
-        }
-    };
-*/
-
+    private static LineGraphSeries<DataPoint> mSeries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        //requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metrics);
         init();
-        Buttoninit();
+        ButtonInit();
     }
 
     /** initializes graphView object */
     void init(){
-        final GraphView graph = (GraphView) findViewById(R.id.graph);
-        final LineGraphSeries<DataPoint> mSeries = new LineGraphSeries<>(
-                new DataPoint[]{});
+        this.tvTitle.setText("Your Metrics");
+        this.tvTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+
+        GraphView graph = (GraphView) findViewById(R.id.graph);
+        mSeries = new LineGraphSeries<>();
+        graph.addSeries(mSeries);
 
         //X-Axis
         graph.getViewport().setXAxisBoundsManual(true);
@@ -158,78 +85,17 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         graph.getViewport().setMaxX(5);
         graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);
-        graph.addSeries(mSeries);
 
-        //sHandler = new CustomHandler();
-
-        mHandler = new Handler() {
-
-            /**
-             * handles and parses message content
-             *
-             * @param msg Message passed via handler
-             */
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                Log.i("msg.what", Integer.toString(msg.what));
-                switch (msg.what) {
-                    case Constants.SUCCESS_CONNECT:
-                        Log.i("Check", "SUCCESS_CONNECT");
-                        BluetoothActivity.sConnectedThread =
-                                new BluetoothActivity.ConnectedThread((BluetoothSocket) msg.obj);
-                        Toast.makeText(MetricsActivity.this,
-                                "Connected!", Toast.LENGTH_SHORT).show();
-                        Log.i("Check", "TOASTED");
-                        BluetoothActivity.sConnectedThread.start();
-                        break;
-                    case Constants.MESSAGE_READ:
-                        byte[] readBuf = (byte[]) msg.obj;
-                        String strIncom = new String(readBuf, 0, 5);
-
-                        if (strIncom.indexOf('s') == 0 && strIncom.indexOf('.') == 2) {
-                            strIncom = strIncom.replace("s", "");
-                            if (isFloatNumber(strIncom)) {
-                                mSeries.appendData(new DataPoint(graph2LastXValue,
-                                        Double.parseDouble(strIncom)), AutoScrollX, maxPoints);
-                                if (graph2LastXValue >= Xview && Lock == true) {
-                                    mSeries.resetData(new DataPoint[]{});
-                                    graph2LastXValue = 0;
-                                } else {
-                                    graph2LastXValue += 1;
-                                }
-
-                            }
-                        }
-                        break;
-                    default:
-                        Log.i("check", "Default case");
-                        Log.i("msg.what", Integer.toString(msg.what));
-                }
-            }
-
-            /**
-             * Returns true if string can be converted to float
-             *
-             * @param num a string that may be a float
-             * @return boolean: true if string of a flaot
-             */
-            public boolean isFloatNumber(String num) {
-                try {
-                    Double.parseDouble(num);
-                } catch (NumberFormatException nfe) {
-                    return false;
-                }
-                return true;
-            }
-        };
-
+        //temp
+        autoScrollX = true;
     }
 
     /** initializes View objects */
-    void Buttoninit(){
+    void ButtonInit(){
         conbtn.setVisibility(View.GONE);
+        tvSpeed = (TextView) findViewById(R.id.tvSpeed);
         tbStream = (ToggleButton) findViewById(R.id.tbStream);
+        tbStream.setOnClickListener(this);
     }
 
     /** Listens for button clicks and responds accordingly */
@@ -239,17 +105,40 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
             case R.id.tbStream:
                 if(tbStream.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
+                        Log.i("Check", "Start Stream");
                         BluetoothActivity.sConnectedThread.write(Constants.START_STREAM);
                     }
                 } else {
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.STOP_STREAM);
+                        Log.i("Check", "Stop Stream");
                     }
                 }
                 break;
             default:
         }
     }
+
+    /**
+     * Updates GraphView each time its updated
+     * @param strIncom      the incoming message string
+     */
+    public static void plotData(String strIncom){
+        if(strIncom.indexOf('s')==0 && strIncom.indexOf('.')==2){
+            strIncom = strIncom.replace("s", "");
+            if(isFloatNumber(strIncom)){
+                tvSpeed.setText(strIncom);
+
+                mSeries.appendData(new DataPoint(graph2LastXValue,
+                        Double.parseDouble(strIncom)),
+                        autoScrollX, maxPoints);
+
+                graph2LastXValue += 1d;
+
+            }
+        }
+    }
+
     /**
      * Returns true if string can be converted to float
      * @param num       a string that may be a float
@@ -263,22 +152,4 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         }
         return true;
     }
-
-    public static void plotData(String strIncom){
-        if(strIncom.indexOf('s')==0 && strIncom.indexOf('.')==2){
-            strIncom = strIncom.replace("s", "");
-            if(isFloatNumber(strIncom)){
-                mSeries.appendData(new DataPoint(graph2LastXValue,
-                                Double.parseDouble(strIncom)),
-                        AutoScrollX, maxPoints);
-                if(graph2LastXValue >= Xview && Lock == true){
-                    mSeries.resetData(new DataPoint[]{});
-                    graph2LastXValue = 0;
-                } else {
-                    graph2LastXValue += 1;
-                }
-            }
-        }
-    }
-
 }
