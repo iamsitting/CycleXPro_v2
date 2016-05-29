@@ -128,7 +128,6 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
 
-            Log.i("msg.what", Integer.toString(msg.what));
             switch (msg.what){
                 case Constants.SUCCESS_CONNECT:
                     Log.i("Check", "SUCCESS_CONNECT");
@@ -141,8 +140,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-                    String strIncom = new String(readBuf, 0, 5);
-                    MetricsActivity.plotData(strIncom);
+                    MetricsActivity.parseData(new String(readBuf, 0, 5));
                     break;
                 default:
                     Log.i("Check", "Default Case");

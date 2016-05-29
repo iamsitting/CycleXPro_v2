@@ -40,6 +40,51 @@
             android:text="0.0"
             android:textSize="20dp"
             android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Metric 1"
+            android:textSize="25dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvMetric1"
+            android:text="0.0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Metric 2"
+            android:textSize="25dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvMetric2"
+            android:text="0.0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Metric 3"
+            android:textSize="25dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvMetric3"
+            android:text="0.0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
     </LinearLayout>
 
     <LinearLayout
@@ -63,6 +108,7 @@
             android:textOn="Stop Stream"
             android:checked="false"
             android:id="@+id/tbStream"/>
+
     </LinearLayout>
 
 </LinearLayout>

@@ -31,6 +31,7 @@
 package com.cxp.cyclexpro_v2;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -46,6 +47,11 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+
 /**
  * This activity presents data
  * Uses GraphView to plot data
@@ -53,7 +59,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 public class MetricsActivity extends TitleBarActivity implements View.OnClickListener{
 
     ToggleButton tbStream;
-    static TextView tvSpeed;
+    static TextView tvSpeed, tvMetric1, tvMetric2, tvMetric3;
 
     //Declare some variables
     static boolean autoScrollX;
@@ -61,6 +67,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     private static int maxPoints = 40;
 
     private static LineGraphSeries<DataPoint> mSeries;
+    private static OutputStreamWriter osw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +99,16 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
         //temp
         autoScrollX = true;
+
+        //File
+        try{
+            osw = new OutputStreamWriter(
+                    getApplicationContext()
+                            .openFileOutput("data.csv", Context.MODE_APPEND));
+        } catch (IOException e){
+            Log.e("Except", "File open failed"+e.toString());
+        }
+
     }
 
     /** initializes View objects */
@@ -147,8 +164,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         if(strIncom.indexOf('s')==0 && strIncom.indexOf('.')==2){
             strIncom = strIncom.replace("s", "");
             if(isFloatNumber(strIncom)){
-                tvSpeed.setText(strIncom);
-
+                //tvSpeed.setText(strIncom);
                 mSeries.appendData(new DataPoint(graph2LastXValue,
                         Double.parseDouble(strIncom)),
                         autoScrollX, maxPoints);
@@ -157,6 +173,24 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
             }
         }
+    }
+
+    public static void parseData(String str){
+        String[] dataArray = str.split(",");
+
+        try{
+            osw.write(str+"\n");
+        } catch (IOException e){
+            Log.e("Except", "File open failed"+e.toString());
+        }
+
+        //only plot the first metric
+        tvSpeed.setText(dataArray[0]);
+        plotData(dataArray[0]);
+        tvMetric1.setText(dataArray[1]);
+        tvMetric2.setText(dataArray[2]);
+        tvMetric3.setText(dataArray[3]);
+
     }
 
     /**
