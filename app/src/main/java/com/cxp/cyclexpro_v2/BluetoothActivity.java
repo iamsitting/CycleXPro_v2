@@ -1,4 +1,8 @@
 /*
+ * This file is licensed under MIT
+ *
+ * The MIT License (MIT)
+ *
  * Copyright (C) 2016 Carlos Salamanca (@iamsitting)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -26,7 +30,6 @@
 
 package com.cxp.cyclexpro_v2;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -52,7 +55,7 @@ import java.util.Set;
  * This activity manages the Bluetooth Connection.
  */
 
-public class BluetoothActivity extends Activity implements AdapterView.OnItemClickListener {
+public class BluetoothActivity extends TitleBarActivity implements AdapterView.OnItemClickListener {
 
     static ConnectedThread sConnectedThread;
 
@@ -110,6 +113,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
 
     /** Initializes Views and Adapter */
     private void init(){
+        this.tvTitle.setText("Bluetooth Devices");
         listView = (ListView) findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
         listAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, 0);
@@ -187,14 +191,12 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         Log.i("Check", "onItemClick");
         if(sBtAdapter.isDiscovering()){
             sBtAdapter.cancelDiscovery();
-            Log.i("Check", "Discovery is cancelled");
         }
         if(listAdapter.getItem(arg2).contains("(Paired)")){
             BluetoothDevice selectedDevice = devices.get(arg2);
             Log.i("Check", selectedDevice.getName());
             ConnectThread connect = new ConnectThread(selectedDevice);
             connect.start();
-            Log.i("Check", "ConnectThread.start()");
         } else {
             Toast.makeText(getApplicationContext(), "device is not paired", Toast.LENGTH_SHORT).show();
         }
@@ -219,7 +221,6 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                 if (secure) tmp = mmDevice.createRfcommSocketToServiceRecord(Constants.MY_UUID);
                 else tmp = mmDevice.createInsecureRfcommSocketToServiceRecord(Constants.MY_UUID);
 
-                Log.i("Check", "create rfcommsocket");
             } catch(IOException e){
                 Log.e("ConnectThread", "Error:", e);
             }
@@ -252,13 +253,19 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             }
             if (mmSocket.isConnected()) Log.i("Check", "Successful Connection TWO!");
 
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    updateConnectionStatus(true);
+                }
+            });
+
             if (fallback) {
                 MainActivity.sHandler
                         .obtainMessage(Constants.SUCCESS_CONNECT, mmSocket)
                         .sendToTarget();
                 Log.i("Check", "connected to fallback");
             } else {
-                if (mmSocket == null) Log.i("Check", "Socket is null");
                 MainActivity.sHandler
                         .obtainMessage(Constants.SUCCESS_CONNECT, mmSocket)
                         .sendToTarget();
@@ -270,6 +277,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
             try{
                 if (fallback) mmSocket.close();
                 else mmSocket.close();
+
             } catch (IOException e) {}
         }
     }
@@ -312,9 +320,7 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
                         e.printStackTrace();
                     }
                     buffer = new byte[1024];
-                    Log.i("Read", "Checking...");
                     bytes = mmInStream.read(buffer);
-                    Log.i("Read", "Checked");
                     MainActivity.sHandler
                             .obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
@@ -352,6 +358,12 @@ public class BluetoothActivity extends Activity implements AdapterView.OnItemCli
         if(sConnectedThread != null){
             sConnectedThread.cancel();
             sConnectedThread=null;
+            updateConnectionStatus(false);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
     }
 }

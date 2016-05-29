@@ -30,6 +30,9 @@
 
 package com.cxp.cyclexpro_v2;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
@@ -68,6 +71,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         setContentView(R.layout.activity_metrics);
         init();
         ButtonInit();
+
     }
 
     /** initializes graphView object */
@@ -92,7 +96,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     /** initializes View objects */
     void ButtonInit(){
-        conbtn.setVisibility(View.GONE);
+        conbtn.setOnClickListener(this);
         tvSpeed = (TextView) findViewById(R.id.tvSpeed);
         tbStream = (ToggleButton) findViewById(R.id.tbStream);
         tbStream.setOnClickListener(this);
@@ -105,15 +109,31 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
             case R.id.tbStream:
                 if(tbStream.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
-                        Log.i("Check", "Start Stream");
                         BluetoothActivity.sConnectedThread.write(Constants.START_STREAM);
                     }
                 } else {
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.STOP_STREAM);
-                        Log.i("Check", "Stop Stream");
                     }
                 }
+                break;
+            case R.id.conbtn:
+                if(!sBtConnected){
+                    startActivity(new Intent(MetricsActivity.this, BluetoothActivity.class));
+                } else{
+
+                    new AlertDialog.Builder(this)
+                            .setTitle("Disconnecting Bluetooth")
+                            .setMessage("Are you sure you want to disconnect?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which){
+                                    BluetoothActivity.disconnect();
+                                }
+                            }).setNegativeButton("No", null)
+                            .show();
+                }
+                conbtn.invalidate();
                 break;
             default:
         }
@@ -151,5 +171,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(this, MainActivity.class));
     }
 }

@@ -34,7 +34,6 @@
             android:id="@+id/conbtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_bluetooth_off_grey600_36dp"
             android:layout_alignParentEnd="true"/>
 
         </RelativeLayout>

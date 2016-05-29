@@ -1,4 +1,8 @@
 /*
+ * This file is licensed under MIT
+ *
+ * The MIT License (MIT)
+ *
  * Copyright (C) 2016 Carlos Salamanca (@iamsitting)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -26,20 +30,23 @@
 package com.cxp.cyclexpro_v2;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.util.Log;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 /**
  * TitleBarActivity is a superclass; used with extends
  * Creates a custom title bar for the app.
  */
 public class TitleBarActivity extends Activity {
-    protected Button conbtn;
+    protected static Button conbtn;
     protected TextView tvTitle;
+    protected static boolean sBtConnected = false;
 
     /** creates title bar with button and textView */
     @Override
@@ -55,5 +62,32 @@ public class TitleBarActivity extends Activity {
 
         conbtn = (Button) findViewById(R.id.conbtn);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
+        updateConBtn();
     }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        updateConBtn();
+    }
+
+    public static void updateConnectionStatus(boolean status){
+        sBtConnected = status;
+        updateConBtn();
+    }
+    public static void updateConBtn(){
+        Log.i("Check", String.valueOf(sBtConnected));
+        if (sBtConnected){
+            conbtn.setBackgroundResource(R.drawable.ic_bluetooth_connect_white_36dp);
+
+        }
+        else{
+            conbtn.setBackgroundResource(R.drawable.ic_bluetooth_off_grey600_36dp);
+
+        }
+        conbtn.invalidate();
+    }
+
+
+
 }

@@ -1,4 +1,8 @@
 /*
+ * This file is licensed under MIT
+ *
+ * The MIT License (MIT)
+ *
  * Copyright (C) 2016 Carlos Salamanca (@iamsitting)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
@@ -25,7 +29,9 @@
  */
 package com.cxp.cyclexpro_v2;
 
+import android.app.AlertDialog;
 import android.bluetooth.BluetoothSocket;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,8 +40,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
-import com.jjoe64.graphview.series.DataPoint;
 
 /**
  * App launches into this activity
@@ -51,8 +55,10 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         init();
     }
 
+
     /** initializes the Views*/
     void init(){
+
         this.tvTitle.setText("Cycle-X Pro");
         conbtn.setOnClickListener(this);
         Button solobtn = (Button) findViewById(R.id.solobtn);
@@ -75,23 +81,38 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         switch(v.getId()){
             case R.id.solobtn:
                 cl = MetricsActivity.class;
+                startActivity(new Intent(MainActivity.this, cl));
                 break;
             case R.id.trainbtn:
                 cl = MetricsActivity.class;
+                startActivity(new Intent(MainActivity.this, cl));
                 break;
             case R.id.racebtn:
                 cl = MetricsActivity.class;
+                startActivity(new Intent(MainActivity.this, cl));
                 break;
             case R.id.conbtn:
-                cl = BluetoothActivity.class;
-                Log.i("Check", "BTCON...");
-                break;
+                if(!sBtConnected){
+                    cl = BluetoothActivity.class;
+                    startActivity(new Intent(MainActivity.this, cl));
+                    break;
+                } else{
+
+                    new AlertDialog.Builder(this)
+                            .setTitle("Disconnecting Bluetooth")
+                            .setMessage("Are you sure you want to disconnect?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which){
+                                    BluetoothActivity.disconnect();
+                                }
+                            }).setNegativeButton("No", null)
+                            .show();
+                    break;
+                }
             default:
-                cl = MetricsActivity.class;
                 Log.i("Check", "def...");
         }
-        Intent intent = new Intent(MainActivity.this, cl);
-        startActivity(intent);
     }
 
     /**
@@ -116,19 +137,18 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                                     (BluetoothSocket) msg.obj);
                     Toast.makeText(getApplicationContext(), "Connected!",
                             Toast.LENGTH_SHORT).show();
-                    Log.i("Check", "TOASTED");
                     BluetoothActivity.sConnectedThread.start();
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String strIncom = new String(readBuf, 0, 5);
-
                     MetricsActivity.plotData(strIncom);
                     break;
                 default:
                     Log.i("Check", "Default Case");
-                    Log.i("Check", Integer.toString(msg.what));
             }
         }
     }
+
+
 }
