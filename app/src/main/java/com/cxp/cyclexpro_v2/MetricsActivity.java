@@ -47,6 +47,8 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -67,7 +69,11 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     private static int maxPoints = 40;
 
     private static LineGraphSeries<DataPoint> mSeries;
-    private static OutputStreamWriter osw;
+
+    private static File sFile;
+    static String fileName;
+    //private static OutputStreamWriter osw;
+    static FileOutputStream stream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,9 +108,13 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
         //File
         try{
-            osw = new OutputStreamWriter(
-                    getApplicationContext()
-                            .openFileOutput("data.csv", Context.MODE_APPEND));
+            fileName = "tempFile.csv";
+            sFile = new File(this.getFilesDir(), fileName);
+            Log.i("CheckP", sFile.getAbsolutePath());
+            stream = new FileOutputStream(sFile);
+            //osw = new OutputStreamWriter(
+            //        getApplicationContext()
+            //                .openFileOutput("data.csv", Context.MODE_APPEND));
         } catch (IOException e){
             Log.e("Except", "File open failed"+e.toString());
         }
@@ -115,6 +125,9 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     void ButtonInit(){
         conbtn.setOnClickListener(this);
         tvSpeed = (TextView) findViewById(R.id.tvSpeed);
+        tvMetric1 = (TextView) findViewById(R.id.tvMetric1);
+        tvMetric2 = (TextView) findViewById(R.id.tvMetric2);
+        tvMetric3 = (TextView) findViewById(R.id.tvMetric3);
         tbStream = (ToggleButton) findViewById(R.id.tbStream);
         tbStream.setOnClickListener(this);
     }
@@ -176,14 +189,18 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     }
 
     public static void parseData(String str){
-        String[] dataArray = str.split(",");
 
+        // TODO: Debug file management
+        Log.i("Check", str);
         try{
-            osw.write(str+"\n");
+            stream.write((str+"\n").getBytes("UTF-8"));
         } catch (IOException e){
             Log.e("Except", "File open failed"+e.toString());
         }
 
+        String[] dataArray = str.split(",");
+
+        Log.i("Check0", dataArray[0]);
         //only plot the first metric
         tvSpeed.setText(dataArray[0]);
         plotData(dataArray[0]);

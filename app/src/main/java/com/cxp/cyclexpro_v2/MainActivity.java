@@ -41,6 +41,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.nio.charset.Charset;
+
 /**
  * App launches into this activity
  * Presents mode of operations
@@ -140,7 +142,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-                    MetricsActivity.parseData(new String(readBuf, 0, 5));
+                    MetricsActivity.parseData(new String(readBuf));
                     break;
                 default:
                     Log.i("Check", "Default Case");

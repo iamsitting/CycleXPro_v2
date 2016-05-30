@@ -319,7 +319,8 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                     } catch (InterruptedException e){
                         e.printStackTrace();
                     }
-                    buffer = new byte[32];//expecting 'sX.X,sX.X,sX.X,sX.X' about 24 bytes
+                    // TODO: Make sure BT Client sends data in correct format
+                    buffer = new byte[1024];//expecting 'sX.X,sX.X,sX.X,sX.X' about 24 bytes
                     bytes = mmInStream.read(buffer);
                     MainActivity.sHandler
                             .obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
