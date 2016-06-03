@@ -83,20 +83,20 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         switch(v.getId()){
             case R.id.solobtn:
                 cl = MetricsActivity.class;
-                startActivity(new Intent(MainActivity.this, cl));
+                startActivity(new Intent(this, cl));
                 break;
             case R.id.trainbtn:
-                cl = MetricsActivity.class;
-                startActivity(new Intent(MainActivity.this, cl));
+                cl = TrainingActivity.class;
+                startActivity(new Intent(this, cl));
                 break;
             case R.id.racebtn:
                 cl = MetricsActivity.class;
-                startActivity(new Intent(MainActivity.this, cl));
+                startActivity(new Intent(this, cl));
                 break;
             case R.id.conbtn:
                 if(!sBtConnected){
                     cl = BluetoothActivity.class;
-                    startActivity(new Intent(MainActivity.this, cl));
+                    startActivity(new Intent(this, cl));
                     break;
                 } else{
 

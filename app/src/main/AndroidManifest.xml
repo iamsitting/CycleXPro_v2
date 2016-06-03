@@ -24,13 +24,15 @@
         <activity android:name=".TitleBarActivity" />
         <activity
             android:name=".BluetoothActivity"
-            android:label="BluetoothActivity" >
+            android:label="BluetoothActivity">
             <intent-filter>
                 <action android:name="android.intent.action.BT1" />
                 <action android:name="android.bluetooth.adapter.action.FOUND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+        <activity android:name=".TrainingActivity"></activity>
     </application>
 
 </manifest>
