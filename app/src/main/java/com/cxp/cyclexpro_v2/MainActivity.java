@@ -41,8 +41,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.nio.charset.Charset;
-
 /**
  * App launches into this activity
  * Presents mode of operations
@@ -62,7 +60,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
     void init(){
 
         this.tvTitle.setText("Cycle-X Pro");
-        conbtn.setOnClickListener(this);
+        btBtConnection.setOnClickListener(this);
         Button solobtn = (Button) findViewById(R.id.solobtn);
         solobtn.setOnClickListener(this);
         Button trainbtn = (Button) findViewById(R.id.trainbtn);
@@ -144,6 +142,8 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                     byte[] readBuf = (byte[]) msg.obj;
                     MetricsActivity.parseData(new String(readBuf));
                     break;
+                case Constants.XB_CONNECT:
+                    updateXBConnectionStatus(true);
                 default:
                     Log.i("Check", "Default Case");
             }

@@ -9,6 +9,9 @@ import android.widget.Button;
 
 public class TrainingActivity extends TitleBarActivity implements View.OnClickListener {
 
+    Button btTrainer;
+    Button btCyclists;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -18,10 +21,10 @@ public class TrainingActivity extends TitleBarActivity implements View.OnClickLi
 
     public void init(){
         this.tvTitle.setText("Training Mode");
-        conbtn.setOnClickListener(this);
-        Button btTrainer = (Button) findViewById(R.id.btTrainer);
+        btBtConnection.setOnClickListener(this);
+        btTrainer = (Button) findViewById(R.id.btTrainer);
         btTrainer.setOnClickListener(this);
-        Button btCyclists = (Button) findViewById(R.id.btCyclist);
+        btCyclists = (Button) findViewById(R.id.btCyclist);
         btCyclists.setOnClickListener(this);
     }
 
@@ -34,7 +37,7 @@ public class TrainingActivity extends TitleBarActivity implements View.OnClickLi
                 startActivity(new Intent(this, cl));
                 break;
             case R.id.btCyclist:
-                cl = MetricsActivity.class;
+                cl = PairingActivity.class;
                 startActivity(new Intent(this, cl));
                 break;
             case R.id.conbtn:

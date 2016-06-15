@@ -32,7 +32,8 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".TrainingActivity"></activity>
+        <activity android:name=".TrainingActivity" />
+        <activity android:name=".PairingActivity"></activity>
     </application>
 
 </manifest>

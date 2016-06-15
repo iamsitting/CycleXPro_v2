@@ -31,7 +31,6 @@
 package com.cxp.cyclexpro_v2;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -50,8 +49,6 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 
 /**
@@ -123,7 +120,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     /** initializes View objects */
     void ButtonInit(){
-        conbtn.setOnClickListener(this);
+        btBtConnection.setOnClickListener(this);
         tvSpeed = (TextView) findViewById(R.id.tvSpeed);
         tvMetric1 = (TextView) findViewById(R.id.tvMetric1);
         tvMetric2 = (TextView) findViewById(R.id.tvMetric2);
@@ -163,7 +160,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                             }).setNegativeButton("No", null)
                             .show();
                 }
-                conbtn.invalidate();
+                btBtConnection.invalidate();
                 break;
             default:
         }

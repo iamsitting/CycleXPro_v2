@@ -30,23 +30,21 @@
 package com.cxp.cyclexpro_v2;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Window;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 /**
  * TitleBarActivity is a superclass; used with extends
  * Creates a custom title bar for the app.
  */
 public class TitleBarActivity extends Activity {
-    protected static Button conbtn;
+    protected static Button btBtConnection;
     protected TextView tvTitle;
     protected static boolean sBtConnected = false;
+    protected static boolean sXbConnected = false;
 
     /** creates title bar with button and textView */
     @Override
@@ -60,7 +58,7 @@ public class TitleBarActivity extends Activity {
         getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
                 R.layout.title_bar);
 
-        conbtn = (Button) findViewById(R.id.conbtn);
+        btBtConnection = (Button) findViewById(R.id.conbtn);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         updateConBtn();
     }
@@ -71,21 +69,26 @@ public class TitleBarActivity extends Activity {
         updateConBtn();
     }
 
+    public static void updateXBConnectionStatus(boolean status) {
+        sXbConnected = status;
+    }
+
     public static void updateConnectionStatus(boolean status){
         sBtConnected = status;
         updateConBtn();
     }
+
     public static void updateConBtn(){
         Log.i("Check", String.valueOf(sBtConnected));
         if (sBtConnected){
-            conbtn.setBackgroundResource(R.drawable.ic_bluetooth_connect_white_36dp);
+            btBtConnection.setBackgroundResource(R.drawable.ic_bluetooth_connect_white_36dp);
 
         }
         else{
-            conbtn.setBackgroundResource(R.drawable.ic_bluetooth_off_grey600_36dp);
+            btBtConnection.setBackgroundResource(R.drawable.ic_bluetooth_off_grey600_36dp);
 
         }
-        conbtn.invalidate();
+        btBtConnection.invalidate();
     }
 
 
