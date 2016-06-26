@@ -104,6 +104,14 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:textOff="Start Session"
+            android:textOn="End Session"
+            android:checked="false"
+            android:id="@+id/tbSession"/>
+        <ToggleButton
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
             android:textOff="Start Stream"
             android:textOn="Stop Stream"
             android:checked="false"

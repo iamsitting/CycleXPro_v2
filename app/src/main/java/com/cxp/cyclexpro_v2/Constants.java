@@ -41,6 +41,7 @@ public final class Constants {
 
     protected static final String START_STREAM = "E\n";
     protected static final String STOP_STREAM = "Q\n";
+    protected static final String SEND_NEXT_SAMPLE = "K\n";
     protected static final String XB_PAIR = "XB\n";
 
     protected static final int XB_TIMEOUT = 10000;

@@ -57,7 +57,7 @@ import java.io.IOException;
  */
 public class MetricsActivity extends TitleBarActivity implements View.OnClickListener{
 
-    ToggleButton tbStream;
+    ToggleButton tbStream, tbSession;
     static TextView tvSpeed, tvMetric1, tvMetric2, tvMetric3;
 
     //Declare some variables
@@ -67,10 +67,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     private static LineGraphSeries<DataPoint> mSeries;
 
-    private static File sFile;
-    static String fileName;
-    //private static OutputStreamWriter osw;
-    static FileOutputStream stream;
+    DataLogger dl;
+
+    static Boolean sNewData;
+    static String sDataString;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,21 +100,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         graph.getViewport().setScalable(true);
         graph.getViewport().setScrollable(true);
 
-        //temp
+        //conditions
         autoScrollX = true;
-
-        //File
-        try{
-            fileName = "tempFile.csv";
-            sFile = new File(this.getFilesDir(), fileName);
-            Log.i("CheckP", sFile.getAbsolutePath());
-            stream = new FileOutputStream(sFile);
-            //osw = new OutputStreamWriter(
-            //        getApplicationContext()
-            //                .openFileOutput("data.csv", Context.MODE_APPEND));
-        } catch (IOException e){
-            Log.e("Except", "File open failed"+e.toString());
-        }
+        sNewData = false;
+        sDataString = "";
 
     }
 
@@ -127,6 +116,9 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         tvMetric3 = (TextView) findViewById(R.id.tvMetric3);
         tbStream = (ToggleButton) findViewById(R.id.tbStream);
         tbStream.setOnClickListener(this);
+        tbStream.setEnabled(false);
+        tbSession = (ToggleButton) findViewById(R.id.tbSession);
+        tbSession.setOnClickListener(this);
     }
 
     /** Listens for button clicks and responds accordingly */
@@ -137,10 +129,27 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 if(tbStream.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.START_STREAM);
+                        dl.startWriting();
                     }
                 } else {
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.STOP_STREAM);
+                        dl.stopWriting();
+                    }
+                    tbSession.setEnabled(true);
+                    tbSession.setEnabled(false);
+                }
+                break;
+            case R.id.tbSession:
+                if(tbSession.isChecked()){ //TODO: Automate file naming
+                    dl = new DataLogger("todayDate.csv", this);
+                    dl.start();
+                    tbStream.setEnabled(true);
+                    tbSession.setEnabled(false);
+                } else { //TODO: Add Thread to push data to webserver over REST API
+                    tbStream.setEnabled(false);
+                    if (dl.isAlive()) {
+                        dl.finishLog();
                     }
                 }
                 break;
@@ -167,34 +176,13 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     }
 
     /**
-     * Updates GraphView each time its updated
-     * @param strIncom      the incoming message string
+     * Parses the incoming Bluetooth data
+     * @param str       data from the Bluetooth device
      */
-    public static void plotData(String strIncom){
-        if(strIncom.indexOf('s')==0 && strIncom.indexOf('.')==2){
-            strIncom = strIncom.replace("s", "");
-            if(isFloatNumber(strIncom)){
-                //tvSpeed.setText(strIncom);
-                mSeries.appendData(new DataPoint(graph2LastXValue,
-                        Double.parseDouble(strIncom)),
-                        autoScrollX, maxPoints);
-
-                graph2LastXValue += 1d;
-
-            }
-        }
-    }
-
     public static void parseData(String str){
 
-        // TODO: Debug file management
-        Log.i("Check", str);
-        try{
-            stream.write((str+"\n").getBytes("UTF-8"));
-        } catch (IOException e){
-            Log.e("Except", "File open failed"+e.toString());
-        }
-
+        sDataString = str;
+        sNewData = true;
         String[] dataArray = str.split(",");
 
         Log.i("Check0", dataArray[0]);
@@ -204,7 +192,34 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         tvMetric1.setText(dataArray[1]);
         tvMetric2.setText(dataArray[2]);
         tvMetric3.setText(dataArray[3]);
+        BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
+    }
 
+    /**
+     * Updates GraphView each time its updated
+     * @param strIncom      the incoming message string
+     */
+    public static void plotData(String strIncom){
+        if(strIncom.indexOf('s')==0 && strIncom.indexOf('.')==2){
+            strIncom = strIncom.replace("s", "");
+            if(isFloatNumber(strIncom)){
+                //tvSpeed.setText(strIncom);
+                mSeries.appendData(new DataPoint(graph2LastXValue,
+                                Double.parseDouble(strIncom)),
+                        autoScrollX, maxPoints);
+
+                graph2LastXValue += 1d;
+
+            }
+        }
+    }
+
+    public static Boolean isDataNew(){
+        return sNewData;
+    }
+
+    public static void dataIsOld(){
+        sNewData = false;
     }
 
     /**
