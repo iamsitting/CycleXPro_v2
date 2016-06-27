@@ -68,9 +68,9 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     private static LineGraphSeries<DataPoint> mSeries;
 
     DataLogger dl;
+    String lastFileEdited;
 
-    static Boolean sNewData;
-    static String sDataString;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +102,8 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
         //conditions
         autoScrollX = true;
-        sNewData = false;
-        sDataString = "";
+        Globals.sNewData = false;
+        Globals.sDataString = "";
 
     }
 
@@ -146,11 +146,14 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                     dl.start();
                     tbStream.setEnabled(true);
                     tbSession.setEnabled(false);
-                } else { //TODO: Add Thread to push data to webserver over REST API
+                } else {
                     tbStream.setEnabled(false);
                     if (dl.isAlive()) {
+                        lastFileEdited = dl.getFileName();
                         dl.finishLog();
                     }
+                    //if user wants data to get pushed:
+                    //TODO: Add Thread to push data to webserver over REST API
                 }
                 break;
             case R.id.conbtn:
@@ -176,14 +179,14 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     }
 
     /**
-     * Parses the incoming Bluetooth data
-     * @param str       data from the Bluetooth device
+     * Parses the incoming Bluetooth data from byte array to string
+     * @param byteArray       data from the Bluetooth device
      */
-    public static void parseData(String str){
+    public static void parseData(byte[] byteArray){
 
-        sDataString = str;
-        sNewData = true;
-        String[] dataArray = str.split(",");
+        Globals.sBuffer = byteArray;
+        Globals.sNewData = true;
+        String[] dataArray = new String(byteArray).split(",");
 
         Log.i("Check0", dataArray[0]);
         //only plot the first metric
@@ -212,14 +215,6 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
             }
         }
-    }
-
-    public static Boolean isDataNew(){
-        return sNewData;
-    }
-
-    public static void dataIsOld(){
-        sNewData = false;
     }
 
     /**

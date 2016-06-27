@@ -140,7 +140,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                     break;
                 case Constants.MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
-                    MetricsActivity.parseData(new String(readBuf));
+                    MetricsActivity.parseData(readBuf);
                     break;
                 case Constants.XB_CONNECT:
                     updateXBConnectionStatus(true);

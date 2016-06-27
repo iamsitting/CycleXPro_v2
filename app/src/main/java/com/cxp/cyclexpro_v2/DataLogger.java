@@ -18,6 +18,7 @@ public class DataLogger extends Thread{
     static Boolean sWriting = false;
     static Boolean interrupted;
 
+
     public DataLogger(String filename, Context context) {
         interrupted = false;
         try {
@@ -33,10 +34,11 @@ public class DataLogger extends Thread{
     public void run() {
         while (!interrupted) {
             while (sWriting) {
-                if(MetricsActivity.isDataNew()) {
+                if(Globals.sNewData) {
                     try {
-                        outStream.write((MetricsActivity.sDataString+"\n").getBytes("UTF-8"));
-                        MetricsActivity.dataIsOld();
+                        outStream.write(Globals.sBuffer);
+                        Globals.sNewData = false;
+                        outStream.flush();
                     } catch (IOException e) {
                         Log.e("Except", "File write failed"+e.toString());
                     }
@@ -56,6 +58,10 @@ public class DataLogger extends Thread{
 
     static void startWriting(){
         sWriting = true;
+    }
+
+    String getFileName() {
+        return fName;
     }
 
     static void finishLog(){
