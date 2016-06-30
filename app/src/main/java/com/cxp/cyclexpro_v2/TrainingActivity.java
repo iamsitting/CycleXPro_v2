@@ -41,7 +41,7 @@ public class TrainingActivity extends TitleBarActivity implements View.OnClickLi
                 startActivity(new Intent(this, cl));
                 break;
             case R.id.conbtn:
-                if(!sBtConnected){
+                if(!Globals.sBtConnected){
                     cl = BluetoothActivity.class;
                     startActivity(new Intent(this, cl));
                     break;

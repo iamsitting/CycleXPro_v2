@@ -46,7 +46,7 @@ import android.widget.Toast;
  * Presents mode of operations
  */
 public class MainActivity extends TitleBarActivity implements View.OnClickListener{
-    public static CustomHandler sHandler;
+    //public static CustomHandler sHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +67,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         trainbtn.setOnClickListener(this);
         Button racebtn = (Button) findViewById(R.id.racebtn);
         racebtn.setOnClickListener(this);
-        sHandler = new CustomHandler();
+        Globals.sHandler = new CustomHandler(getApplicationContext());
     }
 
     /**
@@ -92,7 +92,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                 startActivity(new Intent(this, cl));
                 break;
             case R.id.conbtn:
-                if(!sBtConnected){
+                if(!Globals.sBtConnected){
                     cl = BluetoothActivity.class;
                     startActivity(new Intent(this, cl));
                     break;
@@ -118,37 +118,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
     /**
      * A custom interface for handler
      */
-    public class CustomHandler extends Handler {
 
-        public CustomHandler() {
-            //In case we need to pass objects to the Handler
-        }
-
-        /** Parses the Handler message */
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-
-            switch (msg.what){
-                case Constants.SUCCESS_CONNECT:
-                    Log.i("Check", "SUCCESS_CONNECT");
-                    BluetoothActivity.sConnectedThread =
-                            new BluetoothActivity.ConnectedThread(
-                                    (BluetoothSocket) msg.obj);
-                    Toast.makeText(getApplicationContext(), "Connected!",
-                            Toast.LENGTH_SHORT).show();
-                    BluetoothActivity.sConnectedThread.start();
-                    break;
-                case Constants.MESSAGE_READ:
-                    byte[] readBuf = (byte[]) msg.obj;
-                    MetricsActivity.parseData(readBuf);
-                    break;
-                case Constants.XB_CONNECT:
-                    updateXBConnectionStatus(true);
-                default:
-                    Log.i("Check", "Default Case");
-            }
-        }
-    }
 
 
 }

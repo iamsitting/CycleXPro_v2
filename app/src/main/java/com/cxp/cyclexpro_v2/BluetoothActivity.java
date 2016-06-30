@@ -256,17 +256,19 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    updateConnectionStatus(true);
+                    Globals.sBtConnected = true;
+                    updateConBtn();
+                    //updateConnectionStatus(true);
                 }
             });
 
             if (fallback) {
-                MainActivity.sHandler
+                Globals.sHandler
                         .obtainMessage(Constants.SUCCESS_CONNECT, mmSocket)
                         .sendToTarget();
                 Log.i("Check", "connected to fallback");
             } else {
-                MainActivity.sHandler
+                Globals.sHandler
                         .obtainMessage(Constants.SUCCESS_CONNECT, mmSocket)
                         .sendToTarget();
             }
@@ -321,7 +323,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                     }
                     buffer = new byte[32];//expecting 'sX.X,sX.X,sX.X,sX.X' about 24 bytes
                     bytes = mmInStream.read(buffer);
-                    MainActivity.sHandler
+                    Globals.sHandler
                             .obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
                             .sendToTarget();
                 } catch (IOException e){
@@ -358,7 +360,9 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
         if(sConnectedThread != null){
             sConnectedThread.cancel();
             sConnectedThread=null;
-            updateConnectionStatus(false);
+            Globals.sBtConnected = false;
+            updateConBtn();
+            //updateConnectionStatus(false);
         }
     }
 

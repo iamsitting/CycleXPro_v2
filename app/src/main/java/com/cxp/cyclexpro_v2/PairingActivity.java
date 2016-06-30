@@ -59,7 +59,7 @@ public class PairingActivity extends TitleBarActivity implements View.OnClickLis
             case R.id.btXbConnect:
 
                 //check if connected to bluetooth
-                if (sBtConnected) {
+                if (Globals.sBtConnected) {
                     //check whether entry is valid
                     if(isValid()){
                         progressDialog.show();
@@ -79,7 +79,7 @@ public class PairingActivity extends TitleBarActivity implements View.OnClickLis
                                 //sXbConnected is static field, will change when XB connects
                                 //times out after a time
                                 //TODO: set correct timeout
-                                while (!sXbConnected || time < Constants.XB_TIMEOUT){
+                                while (!Globals.sXbConnected || time < Constants.XB_TIMEOUT){
                                     time += 1;
                                 }
                                 progressDialog.cancel();
@@ -100,7 +100,7 @@ public class PairingActivity extends TitleBarActivity implements View.OnClickLis
                 }
                 break;
             case R.id.conbtn:
-                if(!sBtConnected){
+                if(!Globals.sBtConnected){
                     cl = BluetoothActivity.class;
                     startActivity(new Intent(this, cl));
                 } else{

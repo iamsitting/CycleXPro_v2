@@ -43,8 +43,6 @@ import android.widget.TextView;
 public class TitleBarActivity extends Activity {
     protected static Button btBtConnection;
     protected TextView tvTitle;
-    protected static boolean sBtConnected = false;
-    protected static boolean sXbConnected = false;
 
     /** creates title bar with button and textView */
     @Override
@@ -69,18 +67,15 @@ public class TitleBarActivity extends Activity {
         updateConBtn();
     }
 
-    public static void updateXBConnectionStatus(boolean status) {
-        sXbConnected = status;
-    }
-
+    /*
     public static void updateConnectionStatus(boolean status){
         sBtConnected = status;
         updateConBtn();
-    }
+    }*/
 
     public static void updateConBtn(){
-        Log.i("Check", String.valueOf(sBtConnected));
-        if (sBtConnected){
+        Log.i("Check", String.valueOf(Globals.sBtConnected));
+        if (Globals.sBtConnected){
             btBtConnection.setBackgroundResource(R.drawable.ic_bluetooth_connect_white_36dp);
 
         }

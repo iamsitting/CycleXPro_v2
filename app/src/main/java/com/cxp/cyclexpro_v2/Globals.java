@@ -9,8 +9,11 @@ public class Globals {
         //restrict instantiation
     }
     //DataLogger
-    protected static Boolean sNewData;
-    protected static String sDataString;
+    protected static boolean sNewData = false;
+    protected static String sDataString = "";
     protected static byte[] sBuffer;
+    protected static boolean sBtConnected = false;
+    protected static boolean sXbConnected = false;
+    protected static CustomHandler sHandler;
 
 }

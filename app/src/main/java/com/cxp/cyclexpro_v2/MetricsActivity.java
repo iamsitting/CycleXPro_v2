@@ -40,6 +40,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.jjoe64.graphview.GraphView;
@@ -137,7 +138,6 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                         dl.stopWriting();
                     }
                     tbSession.setEnabled(true);
-                    tbSession.setEnabled(false);
                 }
                 break;
             case R.id.tbSession:
@@ -148,16 +148,28 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                     tbSession.setEnabled(false);
                 } else {
                     tbStream.setEnabled(false);
-                    if (dl.isAlive()) {
+                    while (dl.isAlive()) {//TODO: Add timeout
                         lastFileEdited = dl.getFileName();
                         dl.finishLog();
                     }
+
+                    new AlertDialog.Builder(this)
+                            .setTitle("Save Session")
+                            .setMessage("Do you want to save this session?")
+                            .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which){
+                                    Toast.makeText(getApplicationContext(), lastFileEdited+" saved!",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            }).setNegativeButton("No", null)//TODO: Change negative effect
+                            .show();
                     //if user wants data to get pushed:
-                    //TODO: Add Thread to push data to webserver over REST API
+
                 }
                 break;
             case R.id.conbtn:
-                if(!sBtConnected){
+                if(!Globals.sBtConnected){
                     startActivity(new Intent(MetricsActivity.this, BluetoothActivity.class));
                 } else{
 

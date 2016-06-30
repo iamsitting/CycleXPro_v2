@@ -33,7 +33,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".TrainingActivity" />
-        <activity android:name=".PairingActivity"></activity>
+        <activity android:name=".PairingActivity" />
+        <activity android:name=".DataListActivity"></activity>
     </application>
 
 </manifest>
