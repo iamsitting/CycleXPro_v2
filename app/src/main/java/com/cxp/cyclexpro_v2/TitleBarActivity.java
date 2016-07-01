@@ -32,9 +32,13 @@ package com.cxp.cyclexpro_v2;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * TitleBarActivity is a superclass; used with extends
@@ -43,6 +47,7 @@ import android.widget.TextView;
 public class TitleBarActivity extends Activity {
     protected static Button btBtConnection;
     protected TextView tvTitle;
+    protected Button btMenu;
 
     /** creates title bar with button and textView */
     @Override
@@ -59,6 +64,8 @@ public class TitleBarActivity extends Activity {
         btBtConnection = (Button) findViewById(R.id.conbtn);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         updateConBtn();
+
+        btMenu = (Button) findViewById(R.id.btMenu);
     }
 
     @Override

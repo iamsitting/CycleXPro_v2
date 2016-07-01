@@ -33,13 +33,21 @@ import android.app.AlertDialog;
 import android.bluetooth.BluetoothSocket;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.Toast;
+
+import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * App launches into this activity
@@ -52,6 +60,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        dateInit();
         init();
     }
 
@@ -61,6 +70,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
 
         this.tvTitle.setText("Cycle-X Pro");
         btBtConnection.setOnClickListener(this);
+        btMenu.setOnClickListener(this);
         Button solobtn = (Button) findViewById(R.id.solobtn);
         solobtn.setOnClickListener(this);
         Button trainbtn = (Button) findViewById(R.id.trainbtn);
@@ -110,10 +120,57 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                             .show();
                     break;
                 }
+            case R.id.btMenu:
+                PopupMenu popupMenu = new PopupMenu(getApplicationContext(), btMenu);
+                popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.itemSettings:
+                                Toast.makeText(getApplicationContext(), "Setting page not done ", Toast.LENGTH_SHORT).show();
+                                break;
+                            case R.id.itemPushData:
+                                startActivity(new Intent(MainActivity.this, DataListActivity.class));
+                                break;
+                        }
+
+                        return true;
+                    }
+                });
+                popupMenu.show();
+                break;
             default:
                 Log.i("Check", "def...");
         }
     }
+
+    public void dateInit(){
+        Globals.memory = getSharedPreferences(Constants.PREFS_NAME, 0);
+        Globals.editor = Globals.memory.edit();
+
+        String savedDate = Globals.memory.getString(Constants.PREFS_KEY_DATE,
+                Constants.DATE_NOT_EXISTS);
+        int savedSession = Globals.memory.getInt(Constants.PREFS_KEY_SESSION,
+                Constants.SESH_NOT_EXISTS);
+        String today = new SimpleDateFormat("MM-dd-yyyy").format(new Date());
+
+        if(savedDate.equals(Constants.DATE_NOT_EXISTS)){
+            Globals.editor.putString(Constants.PREFS_KEY_DATE, today);
+            Globals.editor.putInt(Constants.PREFS_KEY_SESSION, 0);
+            Globals.editor.apply();
+        } else if(!savedDate.equals(today)){
+            Globals.editor.putString(Constants.PREFS_KEY_DATE, today);
+            Globals.editor.putInt(Constants.PREFS_KEY_SESSION, 0);
+            Globals.editor.apply();
+        } else if (savedSession == Constants.SESH_NOT_EXISTS){
+            Globals.editor.putInt(Constants.PREFS_KEY_SESSION, 0);
+            Globals.editor.apply();
+            }
+
+
+    }
+
 
     /**
      * A custom interface for handler

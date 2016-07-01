@@ -31,10 +31,18 @@
             android:layout_alignParentStart="true"/>
 
         <Button
+            android:id="@+id/btMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@drawable/ic_dots_vertical_white_36dp"/>
+
+
+        <Button
             android:id="@+id/conbtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"/>
+            android:layout_toLeftOf="@+id/btMenu"/>
 
         </RelativeLayout>
     </android.support.v7.widget.Toolbar>

@@ -22,7 +22,7 @@ public class DataLogger extends Thread{
     public DataLogger(String filename, Context context) {
         interrupted = false;
         try {
-            fName = filename; //TODO: Make sure file is visible in file system
+            fName = filename;
             file = new File(context.getFilesDir(), fName);
             Log.i("CheckP", file.getAbsolutePath());
             outStream = new FileOutputStream(file, true);

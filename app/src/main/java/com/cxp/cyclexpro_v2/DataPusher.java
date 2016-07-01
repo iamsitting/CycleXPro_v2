@@ -14,9 +14,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -80,12 +82,15 @@ public class DataPusher extends Thread {
 
         try {
             keys = bReader.readLine().split(","); //first line of CSV contains keys for JSON
+            Log.i("Check-Keys", Arrays.toString(keys));
             while((line=bReader.readLine()) != null) {
                 values = line.split(",");
 
                 JSONObject tempJsonObj = new JSONObject();
-                for (int i=0; i < keys.length; i++) {
-                    tempJsonObj.put(keys[i], values[i]);
+                if(keys.length == values.length){
+                    for (int i=0; i < keys.length; i++) {
+                        tempJsonObj.put(keys[i], values[i]);
+                    }
                 }
 
                 retJsonArray.put(tempJsonObj);

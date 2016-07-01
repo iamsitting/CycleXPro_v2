@@ -45,4 +45,10 @@ public final class Constants {
     protected static final String XB_PAIR = "XB\n";
 
     protected static final int XB_TIMEOUT = 10000;
+
+    public static final String PREFS_NAME = "CXPPreferences";
+    public static final String PREFS_KEY_DATE = "Date";
+    public static final String DATE_NOT_EXISTS = "null";
+    public static final String PREFS_KEY_SESSION =  "Session";
+    public static final int SESH_NOT_EXISTS = -1;
 }

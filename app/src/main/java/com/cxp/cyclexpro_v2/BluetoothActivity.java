@@ -362,6 +362,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             sConnectedThread=null;
             Globals.sBtConnected = false;
             updateConBtn();
+            //TODO: Fix BT icon to update on disconnect
             //updateConnectionStatus(false);
         }
     }

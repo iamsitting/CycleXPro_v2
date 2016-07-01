@@ -33,6 +33,7 @@ package com.cxp.cyclexpro_v2;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
@@ -70,6 +71,8 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     DataLogger dl;
     String lastFileEdited;
+    String savedDate;
+    int savedSession;
 
 
 
@@ -82,7 +85,6 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         setContentView(R.layout.activity_metrics);
         init();
         ButtonInit();
-
     }
 
     /** initializes graphView object */
@@ -106,6 +108,11 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         Globals.sNewData = false;
         Globals.sDataString = "";
 
+        //File naming
+        savedDate = Globals.memory.getString(Constants.PREFS_KEY_DATE,
+                Constants.DATE_NOT_EXISTS);
+        savedSession = Globals.memory.getInt(Constants.PREFS_KEY_SESSION,
+                Constants.SESH_NOT_EXISTS);
     }
 
     /** initializes View objects */
@@ -140,9 +147,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                     tbSession.setEnabled(true);
                 }
                 break;
-            case R.id.tbSession:
-                if(tbSession.isChecked()){ //TODO: Automate file naming
-                    dl = new DataLogger("todayDate.csv", this);
+            case R.id.tbSession: //TODO: Start session with CSV header rather than values
+                if(tbSession.isChecked()){
+                    String name = makeFileNmae(savedDate, savedSession);
+                    dl = new DataLogger(name, this);
                     dl.start();
                     tbStream.setEnabled(true);
                     tbSession.setEnabled(false);
@@ -159,10 +167,23 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener(){
                                 @Override
                                 public void onClick(DialogInterface dialog, int which){
+                                    Globals.editor.putInt(Constants.PREFS_KEY_SESSION, ++savedSession);
+                                    Globals.editor.apply();
                                     Toast.makeText(getApplicationContext(), lastFileEdited+" saved!",
                                             Toast.LENGTH_SHORT).show();
                                 }
-                            }).setNegativeButton("No", null)//TODO: Change negative effect
+                            })
+                            .setNegativeButton("No", new DialogInterface.OnClickListener(){
+                                @Override
+                                public void onClick(DialogInterface dialog, int which){
+                                    File delFile = new File(getFilesDir().getAbsolutePath(), lastFileEdited);
+                                    boolean delCheck = delFile.delete();
+                                    if(delCheck){
+                                        Toast.makeText(getApplicationContext(), lastFileEdited+" deleted!",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                    })
                             .show();
                     //if user wants data to get pushed:
 
@@ -195,7 +216,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
      * @param byteArray       data from the Bluetooth device
      */
     public static void parseData(byte[] byteArray){
-
+        //TODO: Parse out the leading 's'
         Globals.sBuffer = byteArray;
         Globals.sNewData = true;
         String[] dataArray = new String(byteArray).split(",");
@@ -241,6 +262,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
             return false;
         }
         return true;
+    }
+
+    public String makeFileNmae(String date, int session){
+        return date+"-"+Integer.toString(session)+".csv";
     }
 
     @Override
