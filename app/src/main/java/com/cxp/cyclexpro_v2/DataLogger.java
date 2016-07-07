@@ -1,12 +1,14 @@
 package com.cxp.cyclexpro_v2;
 
 import android.content.Context;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
 
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by Carlos on 6/25/2016.
@@ -51,6 +53,7 @@ public class DataLogger extends Thread{
             Log.e("Except", "File close failed"+e.toString());
         }
     }
+
 
     static void stopWriting(){
         sWriting = false;

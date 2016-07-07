@@ -311,8 +311,9 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
          * Passes messages to the Handler
          */
         public void run(){
-            byte[] buffer;
-            int bytes;
+            byte[] buffer = new byte[1024];
+            int bytes = 0;
+            int begin = 0;
 
             while(true){
                 try{
@@ -321,11 +322,30 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                     } catch (InterruptedException e){
                         e.printStackTrace();
                     }
-                    buffer = new byte[32];//expecting 'sX.X,sX.X,sX.X,sX.X' about 24 bytes
-                    bytes = mmInStream.read(buffer);
-                    Globals.sHandler
-                            .obtainMessage(Constants.MESSAGE_READ, bytes, -1, buffer)
-                            .sendToTarget();
+
+                    //accumulate bytes
+                    bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
+                    //iterate after each accumulation
+                    for(int i = begin; i < bytes; i++){
+                        //Find the NULL character (0x00)
+                        if(buffer[i] == 0x00){
+                            //change it to LF character, 0x0A
+                            buffer[i] = 0x0A;
+                            //send the entire buffer
+                            //send the starting index, begin
+                            //send the ending index + 1 (++i), because of exclusivity
+                            Globals.sHandler
+                                    .obtainMessage(Constants.MESSAGE_READ, begin, ++i, buffer)
+                                    .sendToTarget();
+                            if(i == bytes){ //if at end of buffer, start from beginning
+                                bytes = 0;
+                                begin = 0;
+                            } else { //if not, go to the next adjacent slot
+                                begin = i;
+                            }
+                        }
+                    }
+
                 } catch (IOException e){
                     break;
                 }

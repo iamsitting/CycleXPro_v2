@@ -2,6 +2,7 @@ package com.cxp.cyclexpro_v2;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,14 +28,26 @@ import java.util.Scanner;
 public class DataPusher extends Thread {
     File file;
     BufferedReader bReader;
+    Context con;
+    String filename;
 
     public DataPusher(String fName, Context context) {
-        file = new File(context.getFilesDir(), fName);
+        con = context;
+        file = new File(con.getFilesDir(), fName);
+        filename = fName; //TODO: Make sure filename parameters get sent as JSON
     }
 
     public void run() {
         //TODO: Handle HTTP response to know what do next
-        sendToServer();
+        int status = sendToServer();
+        Log.i("HTTP:", Integer.toString(status));
+        //Server Side TODOs
+        //TODO: Handle file naming
+        //TODO: Access files on webpage
+        //TODO: Show data on webpage
+        //TODO: CSV header should be written to local file
+        //Toast.makeText(con.getApplicationContext(), Integer.toString(status), Toast.LENGTH_SHORT).show();
+
     }
 
     /**
@@ -148,6 +161,8 @@ public class DataPusher extends Thread {
                 return 0;
             case "200":
                 return 1;
+            case "201":
+                return 10;
             case "500":
                 return 2;
             case "404":

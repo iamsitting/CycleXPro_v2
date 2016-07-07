@@ -7,6 +7,8 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 /**
  * Created by Carlos on 6/29/2016.
  */
@@ -33,7 +35,7 @@ public class CustomHandler extends Handler {
                 break;
             case Constants.MESSAGE_READ:
                 byte[] readBuf = (byte[]) msg.obj;
-                MetricsActivity.parseData(readBuf);
+                MetricsActivity.parseData( Arrays.copyOfRange(readBuf, msg.arg1, msg.arg2));
                 break;
             case Constants.XB_CONNECT:
                 Globals.sXbConnected = true;

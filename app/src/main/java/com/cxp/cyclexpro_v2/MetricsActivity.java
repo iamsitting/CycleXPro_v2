@@ -51,6 +51,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 
 /**
@@ -149,6 +150,9 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 break;
             case R.id.tbSession: //TODO: Start session with CSV header rather than values
                 if(tbSession.isChecked()){
+                    if(BluetoothActivity.sConnectedThread != null){
+                        BluetoothActivity.sConnectedThread.write((Constants.NEW_SESSION));
+                    }
                     String name = makeFileNmae(savedDate, savedSession);
                     dl = new DataLogger(name, this);
                     dl.start();
@@ -216,18 +220,33 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
      * @param byteArray       data from the Bluetooth device
      */
     public static void parseData(byte[] byteArray){
-        //TODO: Parse out the leading 's'
         Globals.sBuffer = byteArray;
         Globals.sNewData = true;
-        String[] dataArray = new String(byteArray).split(",");
+        String tempDelete = "";
 
-        Log.i("Check0", dataArray[0]);
-        //only plot the first metric
-        tvSpeed.setText(dataArray[0]);
-        plotData(dataArray[0]);
-        tvMetric1.setText(dataArray[1]);
-        tvMetric2.setText(dataArray[2]);
-        tvMetric3.setText(dataArray[3]);
+        try{
+            tempDelete = new String(byteArray, "UTF-8");
+        } catch (UnsupportedEncodingException  e){
+            Log.e("StrX", e.toString());
+        }
+
+        String[] dataArray = tempDelete.split(",");
+
+        switch (dataArray.length){
+            case 4:
+                tvSpeed.setText(dataArray[3]);
+            case 3:
+                tvMetric1.setText(dataArray[2]);
+            case 2:
+                tvMetric2.setText(dataArray[1]);
+            case 1:
+                tvMetric3.setText(dataArray[0]);
+                plotData(dataArray[0]);
+                break;
+            default:
+
+        }
+
         BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
     }
 
@@ -236,10 +255,8 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
      * @param strIncom      the incoming message string
      */
     public static void plotData(String strIncom){
-        if(strIncom.indexOf('s')==0 && strIncom.indexOf('.')==2){
-            strIncom = strIncom.replace("s", "");
+        if(strIncom.indexOf('.')<5){
             if(isFloatNumber(strIncom)){
-                //tvSpeed.setText(strIncom);
                 mSeries.appendData(new DataPoint(graph2LastXValue,
                                 Double.parseDouble(strIncom)),
                         autoScrollX, maxPoints);
