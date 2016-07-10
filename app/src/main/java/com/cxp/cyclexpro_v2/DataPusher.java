@@ -41,11 +41,6 @@ public class DataPusher extends Thread {
         //TODO: Handle HTTP response to know what do next
         int status = sendToServer();
         Log.i("HTTP:", Integer.toString(status));
-        //Server Side TODOs
-        //TODO: Handle file naming
-        //TODO: Access files on webpage
-        //TODO: Show data on webpage
-        //TODO: CSV header should be written to local file
         //Toast.makeText(con.getApplicationContext(), Integer.toString(status), Toast.LENGTH_SHORT).show();
 
     }
@@ -81,31 +76,34 @@ public class DataPusher extends Thread {
      * @return      a JSONArray format of the CSV file
      */
     public JSONArray csvToJson(){
+        JSONObject nameJsonObj = new JSONObject();
         if(file.exists()) {
             try {
                 bReader = new BufferedReader(new FileReader(file));
+                nameJsonObj.put("title", filename);
             } catch (IOException e) {
                 Log.e("Except", "File open failed"+e.toString());
+            } catch (JSONException e) {
+                Log.e("Except", "Json title:"+e.toString());
             }
+
         }
         String line;
         String[] keys;
         String[] values;
         JSONArray retJsonArray = new JSONArray();
+        retJsonArray.put(nameJsonObj);
 
         try {
             keys = bReader.readLine().split(","); //first line of CSV contains keys for JSON
-            Log.i("Check-Keys", Arrays.toString(keys));
             while((line=bReader.readLine()) != null) {
                 values = line.split(",");
-
                 JSONObject tempJsonObj = new JSONObject();
                 if(keys.length == values.length){
                     for (int i=0; i < keys.length; i++) {
                         tempJsonObj.put(keys[i], values[i]);
                     }
                 }
-
                 retJsonArray.put(tempJsonObj);
             }
 
