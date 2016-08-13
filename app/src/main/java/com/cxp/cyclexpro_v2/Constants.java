@@ -36,7 +36,8 @@ public final class Constants {
     protected static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     protected static final int SUCCESS_CONNECT = 0;
-    protected static final int MESSAGE_READ = 1;
+    protected static final int DATA_READ = 1;
+    protected static final int HEADER_READ = 2;
     protected static final int XB_CONNECT = 3;
 
     protected static final String START_STREAM = "E\n";

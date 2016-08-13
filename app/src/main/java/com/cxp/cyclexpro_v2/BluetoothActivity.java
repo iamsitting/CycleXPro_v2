@@ -38,6 +38,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -170,7 +171,12 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
     @Override
     protected void onPause(){
         super.onPause();
-        unregisterReceiver(receiver);
+        try{
+            unregisterReceiver(receiver);
+        } catch (IllegalArgumentException ex){
+            Log.w("Unreg", ex.toString());
+        }
+
     }
 
     /** If connection is cancelled, Toast tells user to turn on BT */
@@ -313,7 +319,11 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
         public void run(){
             byte[] buffer = new byte[1024];
             int bytes = 0;
-            int begin = 0;
+            int begin = 0;//start of buffer iterator
+            int start = 0;//start of message
+            byte checksum = 0;
+            int length = 0;
+            int protocol = 0;
 
             while(true){
                 try{
@@ -323,19 +333,97 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                         e.printStackTrace();
                     }
 
-                    //accumulate bytes
                     bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
-                    //iterate after each accumulation
+                    for(int i =  begin; i < bytes; i++){
+                        if((buffer[i] & 0xFF) == 0xA7){ //terminating byte
+                            Log.i("trmn8", Integer.toString((buffer[i] & 0xFF)));
+                            protocol = buffer[i-1];
+                            switch (protocol){
+                                case 1:
+                                    length = 18;
+                                    break;
+                                case 2:
+                                    length = 19;
+                                    break;
+                                default:
+                                    length = 0;
+                            }
+                            Log.i("length", Integer.toString(length));
+                            start = i - 2 - length; //TODO: start should be non-negative
+                            if(start >= 0){
+                                Log.i("start", Integer.toString(start));
+                                for(int j=0; j < length; j++){
+                                    Log.i("B", String.format("0x%02X", buffer[start+j]));
+                                    checksum = (byte) (checksum + buffer[start+j] );
+                                }
+
+                                Log.i("cscalc", Integer.toString(checksum));
+                                Log.i("cssent", Integer.toString( buffer[i-2]));
+                                if((checksum ) == (buffer[i-2])){
+
+                                    buffer[i-2] = 0x0A;
+                                    //protocol to line feed
+                                    Globals.sHandler
+                                            .obtainMessage(protocol, start, i-1, buffer)
+                                            .sendToTarget();
+                                } else {
+                                    switch (protocol){
+                                        case 1:
+                                            sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
+                                            break;
+                                        case 2:
+                                            sConnectedThread.write(Constants.NEW_SESSION);
+                                            break;
+                                    }
+                                }
+                                checksum = 0;
+
+                            }
+
+                        }
+
+                        if(i == (bytes - 1)){
+                            bytes = 0;
+                            begin = 0;
+                        } else {
+                            begin = i+1;
+                        }
+                    }
+                    /*
                     for(int i = begin; i < bytes; i++){
+
                         //Find the NULL character (0x00)
                         if(buffer[i] == 0x00){
+
+                            for(int j = begin; j < i-1; j++){ //excludes checksum & terminator
+                                checksum += buffer[j];
+                            }
+                            Log.i("size", Integer.toString(bytes));
+                            Log.i("header", Integer.toString(buffer[begin]));
+
+                            if((checksum & 0xFF) == buffer[i-1]){ //compare checksum
+                                buffer[i-1] = 0x0A; //checksum = line feed character
+
+
+                                Log.i("prot", Integer.toString(buffer[begin+1]));
+
+
+                                if(i == bytes){
+                                    bytes = 0;
+                                    begin = 0;
+                                } else {
+                                    begin = i;
+                                }
+                            }
+                            */
+                            /*
                             //change it to LF character, 0x0A
                             buffer[i] = 0x0A;
                             //send the entire buffer
                             //send the starting index, begin
                             //send the ending index + 1 (++i), because of exclusivity
                             Globals.sHandler
-                                    .obtainMessage(Constants.MESSAGE_READ, begin, ++i, buffer)
+                                    .obtainMessage(Constants.DATA_READ, begin, ++i, buffer)
                                     .sendToTarget();
                             if(i == bytes){ //if at end of buffer, start from beginning
                                 bytes = 0;
@@ -343,10 +431,10 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                             } else { //if not, go to the next adjacent slot
                                 begin = i;
                             }
-                        }
-                    }
+                            */
 
                 } catch (IOException e){
+                    Log.e("BTthread", e.toString());
                     break;
                 }
             }

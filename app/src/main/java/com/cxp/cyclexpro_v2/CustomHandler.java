@@ -33,14 +33,19 @@ public class CustomHandler extends Handler {
                         Toast.LENGTH_SHORT).show();
                 BluetoothActivity.sConnectedThread.start();
                 break;
-            case Constants.MESSAGE_READ:
-                byte[] readBuf = (byte[]) msg.obj;
-                MetricsActivity.parseData( Arrays.copyOfRange(readBuf, msg.arg1, msg.arg2));
+            case Constants.DATA_READ:
+                byte[] dataBuf = (byte[]) msg.obj;
+                Log.i("Check", "parseData");
+                MetricsActivity.parseData( Arrays.copyOfRange(dataBuf, msg.arg1, msg.arg2));
+                break;
+            case Constants.HEADER_READ:
+                byte[] headerBuf = (byte[]) msg.obj;
+                MetricsActivity.parseHeader( Arrays.copyOfRange(headerBuf, msg.arg1, msg.arg2));
                 break;
             case Constants.XB_CONNECT:
                 Globals.sXbConnected = true;
             default:
-                Log.i("Check", "Default Case");
+                Log.i("msg.what", Integer.toString(msg.what));
         }
     }
 }

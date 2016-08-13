@@ -54,7 +54,6 @@ public class DataLogger extends Thread{
         }
     }
 
-
     static void stopWriting(){
         sWriting = false;
     }

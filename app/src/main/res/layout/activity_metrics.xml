@@ -29,7 +29,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Speed"
+            android:text="Label0"
+            android:id="@+id/tvLabel0"
             android:textSize="25dp"
             android:textColor="#FFF"/>
 
@@ -44,7 +45,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Metric 1"
+            android:text="Label1"
+            android:id="@+id/tvLabel1"
             android:textSize="25dp"
             android:textColor="#FFF"/>
 
@@ -59,7 +61,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Metric 2"
+            android:text="Label2"
+            android:id="@+id/tvLabel2"
             android:textSize="25dp"
             android:textColor="#FFF"/>
 
@@ -74,7 +77,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Metric 3"
+            android:text="Label3"
+            android:id="@+id/tvLabel3"
             android:textSize="25dp"
             android:textColor="#FFF"/>
 

@@ -52,6 +52,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 
 /**
@@ -61,7 +64,8 @@ import java.io.UnsupportedEncodingException;
 public class MetricsActivity extends TitleBarActivity implements View.OnClickListener{
 
     ToggleButton tbStream, tbSession;
-    static TextView tvSpeed, tvMetric1, tvMetric2, tvMetric3;
+    static TextView tvMetric0, tvMetric1, tvMetric2, tvMetric3;
+    static TextView tvLabel0, tvLabel1, tvLabel2, tvLabel3;
 
     //Declare some variables
     static boolean autoScrollX;
@@ -119,7 +123,11 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     /** initializes View objects */
     void ButtonInit(){
         btBtConnection.setOnClickListener(this);
-        tvSpeed = (TextView) findViewById(R.id.tvSpeed);
+        tvLabel0 = (TextView) findViewById(R.id.tvLabel0);
+        tvLabel1 = (TextView) findViewById(R.id.tvLabel1);
+        tvLabel2 = (TextView) findViewById(R.id.tvLabel2);
+        tvLabel3 = (TextView) findViewById(R.id.tvLabel3);
+        tvMetric0 = (TextView) findViewById(R.id.tvSpeed);
         tvMetric1 = (TextView) findViewById(R.id.tvMetric1);
         tvMetric2 = (TextView) findViewById(R.id.tvMetric2);
         tvMetric3 = (TextView) findViewById(R.id.tvMetric3);
@@ -220,28 +228,66 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
      * @param byteArray       data from the Bluetooth device
      */
     public static void parseData(byte[] byteArray){
+        //Globals.sBuffer = byteArray;
+        //Globals.sNewData = true;
+
+
+        //time
+        int hour = byteArray[0];
+        int minute = byteArray[1];
+        float second = ByteBuffer.wrap(byteArray, 2, 4)
+                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+        String setText0 = Integer.toString(hour) + ":" +
+                Integer.toString(minute) + ":" +
+                String.format("%.2f", second);
+        //metric1
+        float met1 = ByteBuffer.wrap(byteArray, 6,4)
+                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+        String setText1 = String.format("%.1f", met1);
+        //met2
+        float met2 = ByteBuffer.wrap(byteArray, 10, 4)
+                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+        String setText2 = String.format("%.1f", met2);
+        //met3
+        float met3 = ByteBuffer.wrap(byteArray, 14, 4)
+                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+        String setText3 = String.format("%.1f", met3);
+
+        Globals.sBuffer = (setText0+","+setText1+","+setText2+
+                ","+setText3+"\n").getBytes(StandardCharsets.UTF_8);
+        Globals.sNewData = true;
+
+        tvMetric0.setText(setText0);
+        tvMetric1.setText(setText1);
+        tvMetric2.setText(setText2);
+        tvMetric3.setText(setText3);
+
+        plotData(met1);
+        BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
+    }
+
+    public static void parseHeader(byte[] byteArray){
         Globals.sBuffer = byteArray;
         Globals.sNewData = true;
-        String tempDelete = "";
+        String byteToString = "";
 
         try{
-            tempDelete = new String(byteArray, "UTF-8");
+            byteToString = new String(byteArray, "UTF-8");
+            Log.i("checkData", byteToString);
         } catch (UnsupportedEncodingException  e){
             Log.e("StrX", e.toString());
         }
 
-        String[] dataArray = tempDelete.split(",");
-
+        String[] dataArray = byteToString.split(",");
         switch (dataArray.length){
             case 4:
-                tvSpeed.setText(dataArray[3]);
+                tvLabel0.setText(dataArray[3]);
             case 3:
-                tvMetric1.setText(dataArray[2]);
+                tvLabel1.setText(dataArray[2]);
             case 2:
-                tvMetric2.setText(dataArray[1]);
+                tvLabel2.setText(dataArray[1]);
             case 1:
-                tvMetric3.setText(dataArray[0]);
-                plotData(dataArray[0]);
+                tvLabel3.setText(dataArray[0]);
                 break;
             default:
 
@@ -249,12 +295,16 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
         BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
     }
+    public static void plotData(float value){
+        mSeries.appendData(new DataPoint(graph2LastXValue, value), autoScrollX, maxPoints);
+        graph2LastXValue += 1d;
+    }
 
     /**
      * Updates GraphView each time its updated
      * @param strIncom      the incoming message string
      */
-    public static void plotData(String strIncom){
+    public static void plotData1(String strIncom){
         if(strIncom.indexOf('.')<5){
             if(isFloatNumber(strIncom)){
                 mSeries.appendData(new DataPoint(graph2LastXValue,
