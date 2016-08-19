@@ -52,6 +52,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -156,9 +157,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                     tbSession.setEnabled(true);
                 }
                 break;
-            case R.id.tbSession: //TODO: Start session with CSV header rather than values
+            case R.id.tbSession:
                 if(tbSession.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
+                        Globals.sGoodHeaderRead = false;
                         BluetoothActivity.sConnectedThread.write((Constants.NEW_SESSION));
                     }
                     String name = makeFileNmae(savedDate, savedSession);
@@ -230,31 +232,33 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     public static void parseData(byte[] byteArray){
         //Globals.sBuffer = byteArray;
         //Globals.sNewData = true;
-
-
+        Log.d("H_array", Globals.getHexString(byteArray));
+        String toParse = "";
         //time
         int hour = byteArray[0];
         int minute = byteArray[1];
         float second = ByteBuffer.wrap(byteArray, 2, 4)
-                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
         String setText0 = Integer.toString(hour) + ":" +
                 Integer.toString(minute) + ":" +
                 String.format("%.2f", second);
         //metric1
         float met1 = ByteBuffer.wrap(byteArray, 6,4)
-                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
         String setText1 = String.format("%.1f", met1);
         //met2
         float met2 = ByteBuffer.wrap(byteArray, 10, 4)
-                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
         String setText2 = String.format("%.1f", met2);
         //met3
         float met3 = ByteBuffer.wrap(byteArray, 14, 4)
-                .order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
         String setText3 = String.format("%.1f", met3);
 
-        Globals.sBuffer = (setText0+","+setText1+","+setText2+
-                ","+setText3+"\n").getBytes(StandardCharsets.UTF_8);
+        toParse = setText0+","+setText1+","+setText2+
+                ","+setText3;
+        Globals.sBuffer = (toParse+"\n").getBytes(StandardCharsets.UTF_8);
+        Log.i("pData", toParse);
         Globals.sNewData = true;
 
         tvMetric0.setText(setText0);
@@ -270,9 +274,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         Globals.sBuffer = byteArray;
         Globals.sNewData = true;
         String byteToString = "";
-
+        Log.d("H_array", Globals.getHexString(byteArray));
         try{
-            byteToString = new String(byteArray, "UTF-8");
+            //removes the 0x0A (NL) character
+            byteToString = new String(byteArray, 0, byteArray.length-1, "UTF-8");
             Log.i("checkData", byteToString);
         } catch (UnsupportedEncodingException  e){
             Log.e("StrX", e.toString());
@@ -281,13 +286,13 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         String[] dataArray = byteToString.split(",");
         switch (dataArray.length){
             case 4:
-                tvLabel0.setText(dataArray[3]);
+                tvLabel3.setText(dataArray[3]);
             case 3:
-                tvLabel1.setText(dataArray[2]);
+                tvLabel2.setText(dataArray[2]);
             case 2:
-                tvLabel2.setText(dataArray[1]);
+                tvLabel1.setText(dataArray[1]);
             case 1:
-                tvLabel3.setText(dataArray[0]);
+                tvLabel0.setText(dataArray[0]);
                 break;
             default:
 
@@ -296,6 +301,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
     }
     public static void plotData(float value){
+        Log.i("plotData", Float.toString(value));
         mSeries.appendData(new DataPoint(graph2LastXValue, value), autoScrollX, maxPoints);
         graph2LastXValue += 1d;
     }

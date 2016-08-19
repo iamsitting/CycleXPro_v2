@@ -40,6 +40,7 @@ public class CustomHandler extends Handler {
                 break;
             case Constants.HEADER_READ:
                 byte[] headerBuf = (byte[]) msg.obj;
+                Log.i("Check", "parseHead");
                 MetricsActivity.parseHeader( Arrays.copyOfRange(headerBuf, msg.arg1, msg.arg2));
                 break;
             case Constants.XB_CONNECT:

@@ -37,7 +37,6 @@ public class DataListActivity extends TitleBarActivity implements AdapterView.On
                 .setPositiveButton("Push", new DialogInterface.OnClickListener(){
                     @Override
                     public void onClick(DialogInterface dialog, int which){
-                        //TODO: Add Thread to push data to webserver over REST API
                         dp = new DataPusher(FilesInFolder.get(position), getApplicationContext());
                         dp.start();
                     }
