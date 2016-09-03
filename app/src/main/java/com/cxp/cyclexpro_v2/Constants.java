@@ -32,14 +32,16 @@ public final class Constants {
     private Constants(){
         //restrict instantiation
     }
-
+    /** Bluetooth Constants */
     protected static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    /** CXP Protocols */
     protected static final int SUCCESS_CONNECT = 0;
     protected static final int DATA_READ = 1;
     protected static final int HEADER_READ = 2;
     protected static final int XB_CONNECT = 3;
 
+    /** Bluetooth Feedback Characters */
     protected static final String START_STREAM = "E\n";
     protected static final String STOP_STREAM = "Q\n";
     protected static final String SEND_NEXT_SAMPLE = "K\n";
@@ -48,9 +50,13 @@ public final class Constants {
 
     protected static final int XB_TIMEOUT = 10000;
 
+    /** Preference Constants */
     public static final String PREFS_NAME = "CXPPreferences";
     public static final String PREFS_KEY_DATE = "Date";
     public static final String DATE_NOT_EXISTS = "null";
     public static final String PREFS_KEY_SESSION =  "Session";
     public static final int SESH_NOT_EXISTS = -1;
+
+    /** Web App Constants */
+    public static final String HTTP_URL = "http://cxp.sytes.net/api/";
 }

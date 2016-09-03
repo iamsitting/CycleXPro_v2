@@ -143,7 +143,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     @Override
     public void onClick(View v){
         switch (v.getId()){
-            case R.id.tbStream:
+            case R.id.tbStream: //TODO: handle button toggling better
                 if(tbStream.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.START_STREAM);

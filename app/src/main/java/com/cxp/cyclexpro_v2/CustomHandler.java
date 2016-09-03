@@ -10,7 +10,8 @@ import android.widget.Toast;
 import java.util.Arrays;
 
 /**
- * Created by Carlos on 6/29/2016.
+ * This is a JAVA class that defines the Handler.
+ * The Handler handles messages between the Activities
  */
 public class CustomHandler extends Handler {
     Context con;

@@ -120,7 +120,7 @@ public class DataPusher extends Thread {
      * @return  the HTTP connection
      */
     public HttpURLConnection getHttpConnection() {
-        String postUrl = "http://iamsitting.no-ip.org/api/";
+        String postUrl = Constants.HTTP_URL;
         HttpURLConnection conn = null;
 
         try{
@@ -134,9 +134,9 @@ public class DataPusher extends Thread {
             conn.setRequestMethod("POST");
 
         } catch(MalformedURLException e){
-            Log.e("Except", "URL formation failed"+e.toString());;
+            Log.e("Except", "URL formation failed"+e.toString());
         } catch (IOException e){
-            Log.e("Except", "URL connection failed"+e.toString());;
+            Log.e("Except", "URL connection failed"+e.toString());
         }
 
         return conn;
@@ -144,8 +144,8 @@ public class DataPusher extends Thread {
 
     /**
      * Gets a responses from the HTTP connection and translates to an integer code
-     * @param conn
-     * @return
+     * @param conn - no description
+     * @return - no description
      */
     public int getHttpResponse(HttpURLConnection conn) {
         String response = "000";
@@ -173,8 +173,8 @@ public class DataPusher extends Thread {
 
     /**
      * Converts an InputStream object to a string object
-     * @param is
-     * @return
+     * @param is - no description
+     * @return - no description
      */
     public String streamToString(InputStream is){
         Scanner s = new Scanner(is, "UTF-8").useDelimiter("\\A");
@@ -183,4 +183,3 @@ public class DataPusher extends Thread {
 
 
 }
-;
