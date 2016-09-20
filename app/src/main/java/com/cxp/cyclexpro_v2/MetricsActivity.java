@@ -31,6 +31,7 @@
 package com.cxp.cyclexpro_v2;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -56,6 +57,10 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 
 /**
@@ -67,6 +72,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     ToggleButton tbStream, tbSession;
     static TextView tvMetric0, tvMetric1, tvMetric2, tvMetric3;
     static TextView tvLabel0, tvLabel1, tvLabel2, tvLabel3;
+    private static Context sContext;
 
     //Declare some variables
     static boolean autoScrollX;
@@ -89,6 +95,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metrics);
+        sContext = this.getApplicationContext();
         init();
         ButtonInit();
     }
@@ -163,7 +170,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                         Globals.sGoodHeaderRead = false;
                         BluetoothActivity.sConnectedThread.write((Constants.NEW_SESSION));
                     }
-                    String name = makeFileNmae(savedDate, savedSession);
+                    String name = makeFileName(savedDate, savedSession);
                     dl = new DataLogger(name, this);
                     dl.start();
                     tbStream.setEnabled(true);
@@ -300,6 +307,18 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
         BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
     }
+
+    public static void launchERPS(byte[] byteArray){
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+        df.setTimeZone(tz);
+        String nowAsISO = df.format(new Date());
+
+        Intent intent = new Intent(sContext, ERPSActivity.class);
+        intent.putExtra("erpsData", byteArray);
+        intent.putExtra("currentTime", nowAsISO);
+        sContext.startActivity(intent);
+    }
     public static void plotData(float value){
         Log.i("plotData", Float.toString(value));
         mSeries.appendData(new DataPoint(graph2LastXValue, value), autoScrollX, maxPoints);
@@ -337,7 +356,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         return true;
     }
 
-    public String makeFileNmae(String date, int session){
+    public String makeFileName(String date, int session){
         return date+"-"+Integer.toString(session)+".csv";
     }
 

@@ -44,6 +44,9 @@ public class CustomHandler extends Handler {
                 Log.i("Check", "parseHead");
                 MetricsActivity.parseHeader( Arrays.copyOfRange(headerBuf, msg.arg1, msg.arg2));
                 break;
+            case Constants.ERPS_READ:
+                byte[] erpsBuf = (byte[]) msg.obj;
+                MetricsActivity.launchERPS( Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
             case Constants.XB_CONNECT:
                 Globals.sXbConnected = true;
             default:

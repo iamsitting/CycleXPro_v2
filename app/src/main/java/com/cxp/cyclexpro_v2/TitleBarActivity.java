@@ -49,6 +49,7 @@ public class TitleBarActivity extends Activity {
     protected TextView tvTitle;
     protected Button btMenu;
 
+    //TODO: Add battery indicator
     /** creates title bar with button and textView */
     @Override
     protected void onCreate(Bundle savedInstanceState) {

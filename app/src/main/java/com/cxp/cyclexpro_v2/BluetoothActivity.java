@@ -352,6 +352,8 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                     case 2:
                                         length = 19;
                                         break;
+                                    case 3:
+                                        length = 8;
                                     default:
                                         length = 0;
                                 }
