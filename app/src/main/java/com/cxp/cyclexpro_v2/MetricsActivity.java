@@ -102,7 +102,21 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     /** initializes graphView object */
     void init(){
-        this.tvTitle.setText("Your Metrics");
+        Bundle extras = getIntent().getExtras();
+        String mode = extras.getString("Mode");
+
+        switch (mode){
+            case "SOLO":
+                this.tvTitle.setText("Your Metrics");
+                break;
+            case "TRAINER":
+                this.tvTitle.setText("Cyclist's Metrics");
+                break;
+            case "TRAINEE":
+                this.tvTitle.setText("Your Metrics");
+                break;
+        }
+
         this.tvTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
@@ -150,6 +164,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     @Override
     public void onClick(View v){
         switch (v.getId()){
+            /*
             case R.id.tbStream: //TODO: handle button toggling better
                 if(tbStream.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
@@ -163,20 +178,23 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                     }
                     tbSession.setEnabled(true);
                 }
-                break;
+                break;*/
             case R.id.tbSession:
                 if(tbSession.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
                         Globals.sGoodHeaderRead = false;
-                        BluetoothActivity.sConnectedThread.write((Constants.NEW_SESSION));
+                        BluetoothActivity.sConnectedThread.write((Constants.SOLO_SESSION));
                     }
                     String name = makeFileName(savedDate, savedSession);
                     dl = new DataLogger(name, this);
                     dl.start();
-                    tbStream.setEnabled(true);
-                    tbSession.setEnabled(false);
+                    dl.startWriting();
                 } else {
-                    tbStream.setEnabled(false);
+                    if(BluetoothActivity.sConnectedThread != null){
+                        BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
+                        dl.stopWriting();
+                    }
+                    dl.stopWriting();
                     while (dl.isAlive()) {//TODO: Add timeout
                         lastFileEdited = dl.getFileName();
                         dl.finishLog();

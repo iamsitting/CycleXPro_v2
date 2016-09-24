@@ -33,8 +33,10 @@ public class TrainingActivity extends TitleBarActivity implements View.OnClickLi
         Class cl;
         switch (v.getId()){
             case R.id.btTrainer:
-                cl = MetricsActivity.class;
-                startActivity(new Intent(this, cl));
+                Intent intent = new Intent(this, MetricsActivity.class);
+                intent.putExtra("Mode", "TRAINER");
+                startActivity(intent);
+                startActivity(intent);
                 break;
             case R.id.btCyclist:
                 cl = PairingActivity.class;

@@ -84,8 +84,9 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
         Class cl;
         switch(v.getId()){
             case R.id.solobtn:
-                cl = MetricsActivity.class;
-                startActivity(new Intent(this, cl));
+                Intent intent = new Intent(this, MetricsActivity.class);
+                intent.putExtra("Mode", "SOLO");
+                startActivity(intent);
                 break;
             case R.id.trainbtn:
                 cl = TrainingActivity.class;

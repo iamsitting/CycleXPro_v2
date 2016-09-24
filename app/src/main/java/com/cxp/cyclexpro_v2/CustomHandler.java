@@ -26,13 +26,22 @@ public class CustomHandler extends Handler {
 
         switch (msg.what){
             case Constants.SUCCESS_CONNECT:
-                Log.i("Check", "SUCCESS_CONNECT");
-                BluetoothActivity.sConnectedThread =
-                        new BluetoothActivity.ConnectedThread(
-                                (BluetoothSocket) msg.obj);
-                Toast.makeText(con, "Connected!",
-                        Toast.LENGTH_SHORT).show();
-                BluetoothActivity.sConnectedThread.start();
+                if(BluetoothActivity.sConnectedThread != null){
+                    Log.i("Check", "Already Connected");
+                } else {
+                    Log.i("Check", "SUCCESS_CONNECT");
+                    BluetoothActivity.sConnectedThread =
+                            new BluetoothActivity.ConnectedThread(
+                                    (BluetoothSocket) msg.obj);
+                    Toast.makeText(con, "Connected!",
+                            Toast.LENGTH_SHORT).show();
+                    BluetoothActivity.sConnectedThread.start();
+                }
+                break;
+            case Constants.IDLE_READ:
+                byte[] idleBuf = (byte[]) msg.obj;
+                int blvl = idleBuf[msg.arg1];
+                Log.i("BLVL", Integer.toString(blvl));
                 break;
             case Constants.DATA_READ:
                 byte[] dataBuf = (byte[]) msg.obj;
@@ -46,7 +55,10 @@ public class CustomHandler extends Handler {
                 break;
             case Constants.ERPS_READ:
                 byte[] erpsBuf = (byte[]) msg.obj;
+                Log.i("Check", "parseERPS");
+                BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
                 MetricsActivity.launchERPS( Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
+                break;
             case Constants.XB_CONNECT:
                 Globals.sXbConnected = true;
             default:

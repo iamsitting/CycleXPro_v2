@@ -36,17 +36,24 @@ public final class Constants {
     protected static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     /** CXP Protocols */
-    protected static final int SUCCESS_CONNECT = 0;
+    protected static final int SUCCESS_CONNECT = 63;
     protected static final int DATA_READ = 1;
     protected static final int HEADER_READ = 2;
     protected static final int ERPS_READ = 3;
+    protected static final int IDLE_READ = 27;
     protected static final int XB_CONNECT = 4;
 
     /** Bluetooth Feedback Characters */
-    protected static final String START_STREAM = "E\n";
-    protected static final String STOP_STREAM = "Q\n";
+    protected static final String CONNECT_CONFIRM = "C\n";
+    protected static final String ERPS_ACK = "E\n";
+    protected static final String END_SESSION = "Q\n";
     protected static final String SEND_NEXT_SAMPLE = "K\n";
-    protected static final String NEW_SESSION = "W\n";
+    protected static final String RETRY_NEW_SESSION = "N\n";
+    protected static final String SOLO_SESSION = "W\n";
+    protected static final String TRAINEE_SESSION = "X\n";
+    protected static final String TRAINER_SESSION = "Y\n";
+    protected static final String RACE_SESSION = "Z\n";
+
     protected static final String XB_PAIR = "XB\n";
 
     protected static final int XB_TIMEOUT = 10000;

@@ -66,6 +66,7 @@ public class PairingActivity extends TitleBarActivity implements View.OnClickLis
 
                         cl = MetricsActivity.class;
                         final Intent intent = new Intent(this, cl);
+                        intent.putExtra("Mode", "TRAINEE");
 
                         //this runnable attempts to pair XBees
                         //TODO: Debug XB pairing
