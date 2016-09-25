@@ -6,13 +6,17 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.5.1
+2.5.2
+- Idle/battery mode added
+- Not receiving ERPS messages
 
 ### Most Recent Changes
 
-2.5.1 - ERPS activity and functionality added. Untested.
+2.5.1
+- ERPS activity and functionality added. Untested.
 
-2.5.0 - The App was updated to parse the CXP 2.0.0 data format and protocols
+2.5.0
+- The App was updated to parse the CXP 2.0.0 data format and protocols
 
 ## Code Design
 
