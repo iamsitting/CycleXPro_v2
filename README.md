@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.5.3
+2.5.4
 
 ### Most Recent Changes
+
+2.5.4
+- Enabled and Tested SMS Manager.
+- END_SESSION Command after ERPS ends
 
 2.5.3
 - Fixed ERPS and Timer Issues
@@ -54,6 +58,10 @@ This activity iniitiates Bluetooth connection. It alco contains the BT communica
 ### MetricsActivity.java
 
 This activity is where most of the magic happens. This activity displays data as it is streamed.
+
+### ERPSActivity.java
+
+This activity is created when ERPS is activated from the MCU. At the end of timer, an SMS is sent.
 
 ## License
 

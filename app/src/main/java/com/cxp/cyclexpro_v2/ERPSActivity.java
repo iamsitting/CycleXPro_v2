@@ -64,22 +64,23 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
     public void activateERPS(String latitude, String longitude){
 
         //TODO: phoneNo must come from saved emergency contacts
-        String phoneNo = "9792042437";
+        String phoneNo = "8327907387";
         String message = timeOfAccident+": Carlos has been in an accident. See: "
                 + "http://maps.google.com/maps?q="
                 +latitude
                 +","+longitude;
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-        /*
+        //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+
         //TODO: The SMS code is untested.
         try {
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNo, null, message, null, null);
-            Toast.makeText(getApplicationContext(), "SMS sent.", Toast.LENGTH_LONG);
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
         } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "SMS failed!", Toast.LENGTH_LONG);
+            Toast.makeText(getApplicationContext(), "SMS failed!", Toast.LENGTH_LONG).show();
             e.printStackTrace();
-        } */
+        }
     }
 
     @Override
