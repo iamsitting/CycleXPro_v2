@@ -343,9 +343,11 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                         //find terminating byte
                         if((buffer[i] & 0xFF) == 0xA7){
                             //terminating byte should be deep into the buffer
-                            Log.d("test1", "test");
                             if(i > 2){
                                 protocol = buffer[i-1]; //get protocol byte
+                                if(protocol == 3){
+                                    Log.d("Deb", "Got it!");
+                                }
                                 switch (protocol){
                                     case Constants.IDLE_READ:
                                         length = 7;
@@ -358,7 +360,6 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                         break;
                                     //TODO: HIGH PRIORITY -  Not receiving ERPS messages
                                     case Constants.ERPS_READ:
-                                        Log.d("test2", "test");
                                         length = 8;
                                         break;
                                     default:
@@ -379,11 +380,21 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
 
                                         //protocol to line feed
                                         buffer[i-2] = 0x0A;
-                                        if (protocol == Constants.ERPS_READ)
-                                            Log.d("ERPS", "Good");
-                                        Globals.sHandler
-                                                .obtainMessage(protocol, start, i-1, buffer)
-                                                .sendToTarget();
+                                        if(!Globals.sERPSFlag){
+                                            if(protocol == Constants.ERPS_READ){
+                                                Log.d("ERPS", "Good");
+                                                Globals.sERPSFlag = true;
+                                                BluetoothActivity.sConnectedThread.flush();
+                                                BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
+                                                Globals.sHandler
+                                                        .obtainMessage(protocol, start, i-1, buffer)
+                                                        .sendToTarget();
+                                            } else {
+                                                Globals.sHandler
+                                                        .obtainMessage(protocol, start, i-1, buffer)
+                                                        .sendToTarget();
+                                            }
+                                        }
 
                                         if(protocol == Constants.HEADER_READ){
                                             Globals.sGoodHeaderRead = true;
@@ -404,17 +415,20 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                             }
                         }
                     }
-
                     //if transmission was good, reset
                     if(protocol > 0){
                         if(goodRead){
                             goodRead = false;
                         } else { //else request a "resend"
-                            if(!Globals.sGoodHeaderRead){
-                                sConnectedThread.write(Constants.RETRY_NEW_SESSION);
-                            } else {
-                                sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
+                            Log.d("Deb", "BadRead");
+                            if(protocol != Constants.ERPS_READ){
+                                if(!Globals.sGoodHeaderRead){
+                                    sConnectedThread.write(Constants.RETRY_NEW_SESSION);
+                                } else {
+                                    sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
+                                }
                             }
+
                         }
                     }
 
@@ -423,6 +437,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                     break;
                 }
             }
+            Log.d("Force", "Should never print");
         }
 
         /** Writes string to Bluetooth socket
@@ -432,6 +447,19 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             byte [] data = income.getBytes();
             try{
                 mmOutStream.write(data,0, data.length);
+                try{
+                    Thread.sleep(20);
+                } catch (InterruptedException e){
+                    e.printStackTrace();
+                }
+            } catch (IOException e) {}
+        }
+
+        /** flushes output buffer
+         **/
+        public void flush(){
+            try{
+                mmOutStream.flush();
                 try{
                     Thread.sleep(20);
                 } catch (InterruptedException e){

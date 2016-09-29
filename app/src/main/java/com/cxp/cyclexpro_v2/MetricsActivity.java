@@ -41,6 +41,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -69,7 +70,8 @@ import java.util.TimeZone;
  */
 public class MetricsActivity extends TitleBarActivity implements View.OnClickListener{
 
-    ToggleButton tbStream, tbSession;
+    ToggleButton tbSession;
+    Button btTest;
     static TextView tvMetric0, tvMetric1, tvMetric2, tvMetric3;
     static TextView tvLabel0, tvLabel1, tvLabel2, tvLabel3;
     private static Context sContext;
@@ -81,7 +83,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     private static LineGraphSeries<DataPoint> mSeries;
 
-    DataLogger dl;
+    static DataLogger dl;
     String lastFileEdited;
     String savedDate;
     int savedSession;
@@ -95,7 +97,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metrics);
-        sContext = this.getApplicationContext();
+        sContext = getApplicationContext();
         init();
         ButtonInit();
     }
@@ -153,9 +155,8 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         tvMetric1 = (TextView) findViewById(R.id.tvMetric1);
         tvMetric2 = (TextView) findViewById(R.id.tvMetric2);
         tvMetric3 = (TextView) findViewById(R.id.tvMetric3);
-        tbStream = (ToggleButton) findViewById(R.id.tbStream);
-        tbStream.setOnClickListener(this);
-        tbStream.setEnabled(false);
+        btTest = (Button) findViewById(R.id.btTest);
+        btTest.setOnClickListener(this);
         tbSession = (ToggleButton) findViewById(R.id.tbSession);
         tbSession.setOnClickListener(this);
     }
@@ -164,21 +165,13 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     @Override
     public void onClick(View v){
         switch (v.getId()){
-            /*
-            case R.id.tbStream: //TODO: handle button toggling better
-                if(tbStream.isChecked()){
-                    if(BluetoothActivity.sConnectedThread != null){
-                        BluetoothActivity.sConnectedThread.write(Constants.START_STREAM);
-                        dl.startWriting();
-                    }
-                } else {
-                    if(BluetoothActivity.sConnectedThread != null){
-                        BluetoothActivity.sConnectedThread.write(Constants.STOP_STREAM);
-                        dl.stopWriting();
-                    }
-                    tbSession.setEnabled(true);
-                }
-                break;*/
+            case R.id.btTest:
+                Intent intent = new Intent(MetricsActivity.this, ERPSActivity.class);
+                intent.putExtra("erpsData", new byte[8]);
+                intent.putExtra("currentTime", "MM/DD/YY");
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                sContext.startActivity(intent);
+                break;
             case R.id.tbSession:
                 if(tbSession.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
@@ -192,7 +185,6 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 } else {
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
-                        dl.stopWriting();
                     }
                     dl.stopWriting();
                     while (dl.isAlive()) {//TODO: Add timeout
@@ -327,16 +319,24 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     }
 
     public static void launchERPS(byte[] byteArray){
+        Log.d("DEB","launching ERPS" );
         TimeZone tz = TimeZone.getTimeZone("UTC");
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
         df.setTimeZone(tz);
         String nowAsISO = df.format(new Date());
 
+        dl.stopWriting();
+        while (dl.isAlive()) {//TODO: Add timeout
+            dl.finishLog();
+        }
         Intent intent = new Intent(sContext, ERPSActivity.class);
         intent.putExtra("erpsData", byteArray);
         intent.putExtra("currentTime", nowAsISO);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         sContext.startActivity(intent);
     }
+
+
     public static void plotData(float value){
         Log.i("plotData", Float.toString(value));
         mSeries.appendData(new DataPoint(graph2LastXValue, value), autoScrollX, maxPoints);

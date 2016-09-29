@@ -1,13 +1,20 @@
 package com.cxp.cyclexpro_v2;
 
+import android.app.Activity;
+import android.app.Application;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * This is a JAVA class that defines the Handler.
@@ -56,8 +63,8 @@ public class CustomHandler extends Handler {
             case Constants.ERPS_READ:
                 byte[] erpsBuf = (byte[]) msg.obj;
                 Log.i("Check", "parseERPS");
-                BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
                 MetricsActivity.launchERPS( Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
+                Log.d("DEB","launching ERPS" );
                 break;
             case Constants.XB_CONNECT:
                 Globals.sXbConnected = true;

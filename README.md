@@ -6,11 +6,16 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
+2.5.3
+
+### Most Recent Changes
+
+2.5.3
+- Fixed ERPS and Timer Issues
+
 2.5.2
 - Idle/battery mode added
 - Not receiving ERPS messages
-
-### Most Recent Changes
 
 2.5.1
 - ERPS activity and functionality added. Untested.

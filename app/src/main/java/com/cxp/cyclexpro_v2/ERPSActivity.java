@@ -20,7 +20,7 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
     static TextView tvTimer;
     static Button btCancel;
     private CountDownTimer countDownTimer;
-    private final long startTime = 20*1000;
+    private final long startTime = 10*1000;
     private final long interval = 1 * 1000;
     private boolean timerStarted = false;
     private boolean timerFinished = false;
@@ -33,57 +33,44 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_erps);
+
         init();
+        Log.d("DEB","Starting timer" );
+        Log.d("DEB","Timer Started" );
+
         if(!timerStarted){
             countDownTimer.start();
-            Bundle extras = getIntent().getExtras();
-            byteArray = extras.getByteArray("erpsData");
-            timeOfAccident = extras.getString("currentTime");
+            timerStarted = true;
         }
-        go();
-
-
-
     }
 
     public void init(){
-        this.tvTitle.setText("Your Metrics");
+        Bundle extras = getIntent().getExtras();
+        byteArray = extras.getByteArray("erpsData");
+        timeOfAccident = extras.getString("currentTime");
+        //byteArray = new byte[8];
+        //timeOfAccident = "MMMM";
+
+        Log.d("DEB","done launching ERPS" );
+        this.tvTitle.setText("ERPS");
         this.tvTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+        btCancel = (Button) findViewById(R.id.btCancel);
         btCancel.setOnClickListener(this);
         tvTimer = (TextView) findViewById(R.id.tvTimer);
         countDownTimer = new CustomCountDownTimer(startTime, interval);
 
     }
 
-    public void go(){
-
-        //TODO: ERPS parser untested
-        Log.d("H_array", Globals.getHexString(byteArray));
-
-        //Latitude
-        float latitude = ByteBuffer.wrap(byteArray, 0, 4)
-                .order(ByteOrder.BIG_ENDIAN).getFloat();
-        String lat = String.format("%.6f", latitude);
-
-        //Longitude
-        float longitude = ByteBuffer.wrap(byteArray, 4,4)
-                .order(ByteOrder.BIG_ENDIAN).getFloat();
-        String longi = String.format("%.6f", longitude);
-
-        while(!timerFinished){
-
-        }
-        activateERPS(lat, longi);
-        timerFinished = false;
-    }
-
     public void activateERPS(String latitude, String longitude){
+
         //TODO: phoneNo must come from saved emergency contacts
         String phoneNo = "9792042437";
         String message = timeOfAccident+": Carlos has been in an accident. See: "
                 + "http://maps.google.com/maps?q="
                 +latitude
                 +","+longitude;
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        /*
         //TODO: The SMS code is untested.
         try {
             SmsManager smsManager = SmsManager.getDefault();
@@ -92,7 +79,7 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
         } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "SMS failed!", Toast.LENGTH_LONG);
             e.printStackTrace();
-        }
+        } */
     }
 
     @Override
@@ -115,6 +102,21 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
         public void onFinish() {
             timerFinished = true;
             tvTimer.setText("Activated!");
+
+            //TODO: ERPS parser untested
+            Log.d("H_array", Globals.getHexString(byteArray));
+
+            //Latitude
+            float latitude = ByteBuffer.wrap(byteArray, 0, 4)
+                    .order(ByteOrder.BIG_ENDIAN).getFloat();
+            String lat = String.format("%.6f", latitude);
+
+            //Longitude
+            float longitude = ByteBuffer.wrap(byteArray, 4,4)
+                    .order(ByteOrder.BIG_ENDIAN).getFloat();
+            String longi = String.format("%.6f", longitude);
+
+            activateERPS(lat, longi);
         }
 
         @Override

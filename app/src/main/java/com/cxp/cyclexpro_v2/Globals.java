@@ -28,6 +28,7 @@ public class Globals {
 
     //Bluetooth
     protected static boolean sGoodHeaderRead = false;
+    protected static boolean sERPSFlag = false;
     protected static boolean sBtConnected = false;
     protected static boolean sXbConnected = false;
 
