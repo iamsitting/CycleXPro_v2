@@ -27,11 +27,14 @@ public class Globals {
     protected static byte[] sBuffer;
 
     //Bluetooth
-    protected static boolean sGoodHeaderRead = false;
+    protected static boolean sGoodHeaderRead = true;
     protected static boolean sERPSFlag = false;
     protected static boolean sBtConnected = false;
     protected static boolean sXbConnected = false;
+    protected static boolean sSessionOn = false;
 
+    //Modes
+    protected static int sMode = 0;
     //Debug
     protected static char[] hexArray = "0123456789ABCDEF".toCharArray();
 

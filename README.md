@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.5.4
+2.5.5
 
 ### Most Recent Changes
+
+2.5.5
+- Tested Battery Indicator
+- Rewrote bad reads algorithm
 
 2.5.4
 - Enabled and Tested SMS Manager.

@@ -35,6 +35,12 @@ public final class Constants {
     /** Bluetooth Constants */
     protected static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
+    /** Modes */
+    protected static final int MODE_NONE = 0;
+    protected static final int MODE_SOLO = 1;
+    protected static final int MODE_TRAINEE = 2;
+    protected static final int MODE_TRAINER = 3;
+    protected static final int MODE_RACE = 4;
     /** CXP Protocols */
     protected static final int SUCCESS_CONNECT = 63;
     protected static final int DATA_READ = 1;

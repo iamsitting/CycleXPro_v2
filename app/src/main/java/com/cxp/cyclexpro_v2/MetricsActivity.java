@@ -110,12 +110,15 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         switch (mode){
             case "SOLO":
                 this.tvTitle.setText("Your Metrics");
+                Globals.sMode = Constants.MODE_SOLO;
                 break;
             case "TRAINER":
                 this.tvTitle.setText("Cyclist's Metrics");
+                Globals.sMode = Constants.MODE_TRAINER;
                 break;
             case "TRAINEE":
                 this.tvTitle.setText("Your Metrics");
+                Globals.sMode = Constants.MODE_TRAINEE;
                 break;
         }
 
@@ -182,6 +185,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                     dl = new DataLogger(name, this);
                     dl.start();
                     dl.startWriting();
+                    Globals.sSessionOn = true;
                 } else {
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
@@ -191,6 +195,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                         lastFileEdited = dl.getFileName();
                         dl.finishLog();
                     }
+                    Globals.sSessionOn = false;
 
                     new AlertDialog.Builder(this)
                             .setTitle("Save Session")

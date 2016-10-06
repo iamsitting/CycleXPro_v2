@@ -42,6 +42,15 @@
             android:id="@+id/conbtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/tvBatteryLevel"/>
+
+
+        <TextView
+            android:id="@+id/tvBatteryLevel"
+            android:text="N/A"
+            android:textSize="28dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/btMenu"/>
 
         </RelativeLayout>

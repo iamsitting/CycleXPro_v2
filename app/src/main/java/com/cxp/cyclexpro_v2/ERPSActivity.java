@@ -70,8 +70,6 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
                 +latitude
                 +","+longitude;
         //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-
-        //TODO: The SMS code is untested.
         try {
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendTextMessage(phoneNo, null, message, null, null);
@@ -104,7 +102,6 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
             timerFinished = true;
             tvTimer.setText("Activated!");
 
-            //TODO: ERPS parser untested
             Log.d("H_array", Globals.getHexString(byteArray));
 
             //Latitude

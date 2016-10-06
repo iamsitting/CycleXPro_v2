@@ -34,7 +34,7 @@ public class DataPusher extends Thread {
     public DataPusher(String fName, Context context) {
         con = context;
         file = new File(con.getFilesDir(), fName);
-        filename = fName; //TODO: Make sure filename parameters get sent as JSON
+        filename = fName;
     }
 
     public void run() {

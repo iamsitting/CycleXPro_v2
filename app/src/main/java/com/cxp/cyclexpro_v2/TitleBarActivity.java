@@ -47,9 +47,9 @@ import android.widget.Toast;
 public class TitleBarActivity extends Activity {
     protected static Button btBtConnection;
     protected TextView tvTitle;
+    protected static TextView tvBatteryLevel;
     protected Button btMenu;
 
-    //TODO: Add battery indicator
     /** creates title bar with button and textView */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +64,7 @@ public class TitleBarActivity extends Activity {
 
         btBtConnection = (Button) findViewById(R.id.conbtn);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
+        tvBatteryLevel = (TextView) findViewById(R.id.tvBatteryLevel);
         updateConBtn();
 
         btMenu = (Button) findViewById(R.id.btMenu);
@@ -80,6 +81,10 @@ public class TitleBarActivity extends Activity {
         sBtConnected = status;
         updateConBtn();
     }*/
+
+    public static void updateBatteryLvl(int val){
+        tvBatteryLevel.setText(Integer.toString(val)+"%");
+    }
 
     public static void updateConBtn(){
         Log.i("Check", String.valueOf(Globals.sBtConnected));
