@@ -179,13 +179,13 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 if(tbSession.isChecked()){
                     if(BluetoothActivity.sConnectedThread != null){
                         Globals.sGoodHeaderRead = false;
+                        Globals.sSessionOn = true;
                         BluetoothActivity.sConnectedThread.write((Constants.SOLO_SESSION));
                     }
                     String name = makeFileName(savedDate, savedSession);
                     dl = new DataLogger(name, this);
                     dl.start();
                     dl.startWriting();
-                    Globals.sSessionOn = true;
                 } else {
                     if(BluetoothActivity.sConnectedThread != null){
                         BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
@@ -254,7 +254,6 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     public static void parseData(byte[] byteArray){
         //Globals.sBuffer = byteArray;
         //Globals.sNewData = true;
-        Log.d("H_array", Globals.getHexString(byteArray));
         String toParse = "";
         //time
         int hour = byteArray[0];

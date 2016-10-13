@@ -42,6 +42,15 @@
             android:id="@+id/conbtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/tvThreatIndicator"/>
+
+        <TextView
+            android:id="@+id/tvThreatIndicator"
+            android:text="OK"
+            android:textColor="#888"
+            android:textSize="28dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_toLeftOf="@+id/tvBatteryLevel"/>
 
 

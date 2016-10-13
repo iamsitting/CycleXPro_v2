@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.5.5
+2.5.6
 
 ### Most Recent Changes
+
+2.5.6
+- Threat Indicator added, untested
+- Updated BT receive algorithm
 
 2.5.5
 - Tested Battery Indicator

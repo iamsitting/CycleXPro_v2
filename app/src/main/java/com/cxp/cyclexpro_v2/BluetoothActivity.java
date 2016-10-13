@@ -344,17 +344,15 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                         //find terminating byte
                         if((buffer[i] & 0xFF) == 0xA7){
                             //terminating byte should be deep into the buffer
+                            Log.d("Deb", "Term!");
                             if(i > 2){
                                 protocol = buffer[i-1]; //get protocol byte
-                                if(protocol == 3){
-                                    Log.d("Deb", "Got it!");
-                                }
                                 switch (protocol){
                                     case Constants.IDLE_READ:
                                         length = 7;
                                         break;
                                     case Constants.DATA_READ:
-                                        length = 19;
+                                        length = 20;
                                         break;
                                     case Constants.HEADER_READ:
                                         length = 19;
@@ -381,6 +379,36 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                         //checksum to line feed
                                         buffer[i-2] = 0x0A;
                                         if(!Globals.sERPSFlag){
+                                            switch(protocol){
+                                                case Constants.ERPS_READ:
+                                                    Log.d("ERPS", "Good");
+                                                    Globals.sERPSFlag = true;
+                                                    BluetoothActivity.sConnectedThread.flush();
+                                                    BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
+                                                    //send from start to protocol index
+                                                    Globals.sHandler
+                                                            .obtainMessage(protocol, start, i-1, buffer)
+                                                            .sendToTarget();
+                                                    break;
+                                                case Constants.HEADER_READ:
+                                                    if(!Globals.sGoodHeaderRead){
+                                                        Globals.sGoodHeaderRead = true;
+                                                        Globals.sHandler
+                                                                .obtainMessage(protocol, start, i-1, buffer)
+                                                                .sendToTarget();
+                                                    }
+                                                    break;
+                                                case Constants.DATA_READ:
+                                                case Constants.IDLE_READ:
+                                                    Globals.sHandler
+                                                            .obtainMessage(protocol, start, i-1, buffer)
+                                                            .sendToTarget();
+                                                    //no break
+                                                default:
+
+                                            }
+
+                                            /*
                                             if(protocol == Constants.ERPS_READ){
                                                 Log.d("ERPS", "Good");
                                                 Globals.sERPSFlag = true;
@@ -395,41 +423,46 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                                 Globals.sHandler
                                                         .obtainMessage(protocol, start, i-1, buffer)
                                                         .sendToTarget();
-                                            }
+                                            }*/
                                         }
-
+/*
                                         if(protocol == Constants.HEADER_READ){
                                             Globals.sGoodHeaderRead = true;
-                                        }
-
+                                        }*/
                                         goodRead = true;
                                     }
-                                    checksum = 0;
-
+                                        checksum = 0;
                                 }
                             }
                             //if buffer fills up, start at the beginning
-                            if((i+1) == bytes){
+                            begin = i + 1;
+                            if(i == (bytes-1)){
                                 bytes = 0;
                                 begin = 0;
-                            } else { //else continue where i left off
-                                begin = i+1;
                             }
                         }
                     }
+                    Log.d("bytes:", Integer.toString(bytes));
+                    Log.d("begin:", Integer.toString(begin));
                     //if transmission was good, reset
                     if(goodRead){
                         goodRead = false;
                     } else {
                         Log.d("Deb", "BadRead");
+                        Log.d("Misses", Integer.toString(misses));
                         if(!Globals.sGoodHeaderRead){
                             sConnectedThread.write(Constants.RETRY_NEW_SESSION);
                         }
                         if(Globals.sSessionOn){
-                            if(misses > 10){
-                                sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
-                                misses = 0;
-                            } else {
+                            sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
+
+                        }
+                        if(misses > 5){
+                            bytes = 0;
+                            begin = 0;
+                            misses = 0;
+                        } else {
+                            if(bytes > 950){
                                 misses++;
                             }
                         }

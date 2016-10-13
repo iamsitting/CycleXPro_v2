@@ -30,6 +30,7 @@
 package com.cxp.cyclexpro_v2;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -47,8 +48,9 @@ import android.widget.Toast;
 public class TitleBarActivity extends Activity {
     protected static Button btBtConnection;
     protected TextView tvTitle;
-    protected static TextView tvBatteryLevel;
+    protected static TextView tvBatteryLevel, tvThreatIndicator;
     protected Button btMenu;
+    protected static boolean threatOn = false;
 
     /** creates title bar with button and textView */
     @Override
@@ -65,6 +67,7 @@ public class TitleBarActivity extends Activity {
         btBtConnection = (Button) findViewById(R.id.conbtn);
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvBatteryLevel = (TextView) findViewById(R.id.tvBatteryLevel);
+        tvThreatIndicator = (TextView) findViewById(R.id.tvThreatIndicator);
         updateConBtn();
 
         btMenu = (Button) findViewById(R.id.btMenu);
@@ -81,6 +84,20 @@ public class TitleBarActivity extends Activity {
         sBtConnected = status;
         updateConBtn();
     }*/
+
+    public static void updateThreatIndicator(int val){
+        if(val == 1){
+            if(!threatOn){
+                tvThreatIndicator.setText("!!");
+                tvThreatIndicator.setTextColor(Color.RED);
+            }
+        } else {
+            if(threatOn){
+                tvThreatIndicator.setText("OK");
+                tvThreatIndicator.setTextColor(Color.GRAY);
+            }
+        }
+    }
 
     public static void updateBatteryLvl(int val){
         tvBatteryLevel.setText(Integer.toString(val)+"%");

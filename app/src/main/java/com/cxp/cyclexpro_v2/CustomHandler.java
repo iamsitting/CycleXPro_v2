@@ -48,6 +48,7 @@ public class CustomHandler extends Handler {
             case Constants.IDLE_READ:
                 byte[] idleBuf = (byte[]) msg.obj;
                 //int blvl = idleBuf[msg.arg1];
+                TitleBarActivity.updateThreatIndicator((int) idleBuf[msg.arg1+1]);
                 TitleBarActivity.updateBatteryLvl((int) idleBuf[msg.arg1]);
                 //Log.i("BLVL", Integer.toString(blvl));
                 break;
@@ -58,10 +59,11 @@ public class CustomHandler extends Handler {
                 //msg.arg2-1 is LF character, want
                 //int blvl2 = dataBuf[msg.arg1];
                 //battery
+                TitleBarActivity.updateThreatIndicator((int) dataBuf[msg.arg1+1]);
                 TitleBarActivity.updateBatteryLvl((int) dataBuf[msg.arg1]);
                 //Log.i("BLVL", Integer.toString(blvl2));
                 Log.i("Check", "parseData");
-                MetricsActivity.parseData( Arrays.copyOfRange(dataBuf, msg.arg1+1, msg.arg2));
+                MetricsActivity.parseData( Arrays.copyOfRange(dataBuf, msg.arg1+2, msg.arg2));
                 break;
             case Constants.HEADER_READ:
                 byte[] headerBuf = (byte[]) msg.obj;
