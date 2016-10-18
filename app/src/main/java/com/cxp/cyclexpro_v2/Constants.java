@@ -72,5 +72,5 @@ public final class Constants {
     public static final int SESH_NOT_EXISTS = -1;
 
     /** Web App Constants */
-    public static final String HTTP_URL = "http://cxp.sytes.net/api/";
+    public static final String HTTP_URL = "http://cyclexpro.com/api/";
 }
