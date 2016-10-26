@@ -68,16 +68,34 @@ public class CustomHandler extends Handler {
             case Constants.HEADER_READ:
                 byte[] headerBuf = (byte[]) msg.obj;
                 Log.i("Check", "parseHead");
-                MetricsActivity.parseHeader( Arrays.copyOfRange(headerBuf, msg.arg1, msg.arg2));
+                if(Globals.sMode == Constants.MODE_RACE){
+                    RaceActivity.parseHeader(Arrays.copyOfRange(headerBuf, msg.arg1, msg.arg2));
+                } else {
+                    MetricsActivity.parseHeader( Arrays.copyOfRange(headerBuf, msg.arg1, msg.arg2));
+                }
                 break;
             case Constants.ERPS_READ:
                 byte[] erpsBuf = (byte[]) msg.obj;
                 Log.i("Check", "parseERPS");
-                MetricsActivity.launchERPS( Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
+                if(Globals.sMode == Constants.MODE_RACE){
+                    RaceActivity.launchERPS(Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
+                } else {
+                    MetricsActivity.launchERPS( Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
+                }
                 Log.d("DEB","launching ERPS" );
                 break;
-            case Constants.XB_CONNECT:
-                Globals.sXbConnected = true;
+            case Constants.RACE_READ:
+                byte[] raceBuf = (byte[]) msg.obj;
+                //msg.arg1 is battery
+                //msg.arg2 is protocol, don't want
+                //msg.arg2-1 is LF character, want
+                Log.i("Check", "parseRace");
+                TitleBarActivity.updateThreatIndicator((int) raceBuf[msg.arg1+1]);
+                TitleBarActivity.updateBatteryLvl((int) raceBuf[msg.arg1]);
+                RaceActivity.parseData(Arrays.copyOfRange(raceBuf, msg.arg1+2, msg.arg2));
+                break;
+            //case Constants.XB_CONNECT:
+            //    Globals.sXbConnected = true;
             default:
                 Log.i("msg.what", Integer.toString(msg.what));
         }

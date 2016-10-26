@@ -46,8 +46,9 @@ public final class Constants {
     protected static final int DATA_READ = 1;
     protected static final int HEADER_READ = 2;
     protected static final int ERPS_READ = 3;
+    protected static final int RACE_READ = 4;
     protected static final int IDLE_READ = 27;
-    protected static final int XB_CONNECT = 4;
+    protected static final int XB_CONNECT = 10;
 
     /** Bluetooth Feedback Characters */
     protected static final String CONNECT_CONFIRM = "C\n";

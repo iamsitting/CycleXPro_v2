@@ -360,6 +360,9 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                     case Constants.ERPS_READ:
                                         length = 8;
                                         break;
+                                    case Constants.RACE_READ:
+                                        length = 28;
+                                        break;
                                     default:
                                         length = 0;
                                 }
@@ -400,6 +403,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                                     break;
                                                 case Constants.DATA_READ:
                                                 case Constants.IDLE_READ:
+                                                case Constants.RACE_READ:
                                                     Globals.sHandler
                                                             .obtainMessage(protocol, start, i-1, buffer)
                                                             .sendToTarget();

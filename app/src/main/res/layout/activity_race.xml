@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/bg"
+    android:orientation="horizontal"
+    tools:context="com.cxp.cyclexpro_v2.RaceActivity"
+    android:weightSum="100">
+
+    <com.jjoe64.graphview.GraphView
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/graph"
+        android:orientation="horizontal"
+        android:layout_weight="20"
+        app:seriesType="line"
+        app:seriesColor="#00cc00"
+        android:title="Acceleration"/>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/LL2"
+        android:orientation="vertical"
+        android:layout_weight="40">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Speed"
+            android:id="@+id/tvLabel0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvSpeed"
+            android:text="0.0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="My Dist."
+            android:id="@+id/tvLabel1"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvMetric1"
+            android:text="0.0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Opp. Speed"
+            android:id="@+id/tvLabel2"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvMetric2"
+            android:text="0.0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Opp. Dist."
+            android:id="@+id/tvLabel3"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvMetric3"
+            android:text="0.0"
+            android:textSize="20dp"
+            android:textColor="#FFF"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/LL3"
+        android:orientation="vertical"
+        android:layout_weight="40">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvControl"
+            android:text="Controls"
+            android:textSize="15dp"
+            android:textColor="#FFF"/>
+        <ToggleButton
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textOff="Start Session"
+            android:textOn="End Session"
+            android:checked="false"
+            android:id="@+id/tbSession"/>
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="TEST"
+            android:id="@+id/btTest"/>
+
+    </LinearLayout>
+
+</LinearLayout>

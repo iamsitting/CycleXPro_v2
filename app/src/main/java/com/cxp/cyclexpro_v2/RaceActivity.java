@@ -1,46 +1,15 @@
-/*
- * This file is licensed under MIT
- *
- * The MIT License (MIT)
- *
- * Copyright (C) 2016 Carlos Salamanca (@iamsitting)
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and
- * and associated documentation files (the "Software"), to deal in the Software without restriction,
- * including without limitation the rights to use, copy modify, merge publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do
- * so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies or
- * substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTIBILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
- * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
- * AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
- * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- */
-
-/*
- * @author Carlos Salamanca
- * @version 2.0.0
- */
-
 package com.cxp.cyclexpro_v2;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,10 +20,7 @@ import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -63,13 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
-
-/**
- * This activity presents data
- * Uses GraphView to plot data
- */
-public class MetricsActivity extends TitleBarActivity implements View.OnClickListener{
-
+public class RaceActivity extends TitleBarActivity implements View.OnClickListener {
     ToggleButton tbSession;
     Button btTest;
     static TextView tvMetric0, tvMetric1, tvMetric2, tvMetric3;
@@ -82,51 +42,30 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     private static int maxPoints = 40;
 
     private static LineGraphSeries<DataPoint> mSeries;
+    private static LineGraphSeries<DataPoint> mOppSeries;
 
     static DataLogger dl;
     String lastFileEdited;
     String savedDate;
     int savedSession;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_metrics);
-        sContext = getApplicationContext();
-        init();
-        ButtonInit();
+        setContentView(R.layout.activity_race);
     }
-
     /** initializes graphView object */
     void init(){
-        Bundle extras = getIntent().getExtras();
-        String mode = extras.getString("Mode");
-
-        switch (mode){
-            case "SOLO":
-                this.tvTitle.setText("Your Metrics");
-                Globals.sMode = Constants.MODE_SOLO;
-                break;
-            case "TRAINER":
-                this.tvTitle.setText("Cyclist's Metrics");
-                Globals.sMode = Constants.MODE_TRAINER;
-                break;
-            case "TRAINEE":
-                this.tvTitle.setText("Your Metrics");
-                Globals.sMode = Constants.MODE_TRAINEE;
-                break;
-        }
-
+        Globals.sMode = Constants.MODE_RACE;
         this.tvTitle.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
         mSeries = new LineGraphSeries<>();
+        mSeries.setColor(Color.GREEN);
+        mOppSeries = new LineGraphSeries<>();
+        mOppSeries.setColor(Color.RED);
         graph.addSeries(mSeries);
+        graph.addSeries(mOppSeries);
 
         //X-Axis
         graph.getViewport().setXAxisBoundsManual(true);
@@ -169,7 +108,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     public void onClick(View v){
         switch (v.getId()){
             case R.id.btTest:
-                Intent intent = new Intent(MetricsActivity.this, ERPSActivity.class);
+                Intent intent = new Intent(RaceActivity.this, ERPSActivity.class);
                 intent.putExtra("erpsData", new byte[8]);
                 intent.putExtra("currentTime", "MM/DD/YY");
                 //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -219,7 +158,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                                                 Toast.LENGTH_SHORT).show();
                                     }
                                 }
-                    })
+                            })
                             .show();
                     //if user wants data to get pushed:
 
@@ -227,7 +166,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 break;
             case R.id.conbtn:
                 if(!Globals.sBtConnected){
-                    startActivity(new Intent(MetricsActivity.this, BluetoothActivity.class));
+                    startActivity(new Intent(RaceActivity.this, BluetoothActivity.class));
                 } else{
 
                     new AlertDialog.Builder(this)
@@ -263,18 +202,31 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         String setText0 = Integer.toString(hour) + ":" +
                 Integer.toString(minute) + ":" +
                 String.format("%.2f", second);
+
         //metric1
-        float met1 = ByteBuffer.wrap(byteArray, 6,4)
+        float speed = ByteBuffer.wrap(byteArray, 6,4)
                 .order(ByteOrder.BIG_ENDIAN).getFloat();
-        String setText1 = String.format("%.1f", met1);
+        String setText1 = String.format("%.1f", speed);
+
         //met2
-        float met2 = ByteBuffer.wrap(byteArray, 10, 4)
+        float distance = ByteBuffer.wrap(byteArray, 10, 4)
                 .order(ByteOrder.BIG_ENDIAN).getFloat();
-        String setText2 = String.format("%.1f", met2);
+        String setText2 = String.format("%.1f", distance);
+
         //met3
-        float met3 = ByteBuffer.wrap(byteArray, 14, 4)
+        float calories = ByteBuffer.wrap(byteArray, 14, 4)
                 .order(ByteOrder.BIG_ENDIAN).getFloat();
-        String setText3 = String.format("%.1f", met3);
+        String setText3 = String.format("%.1f", calories);
+
+        //met4
+        float oppSpeed = ByteBuffer.wrap(byteArray, 18, 4)
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
+        String setText4 = String.format("%.1f", oppSpeed);
+
+        //met5
+        float oppDistance = ByteBuffer.wrap(byteArray, 22, 4)
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
+        String setText5 = String.format("%.1f", oppDistance);
 
         toParse = setText0+","+setText1+","+setText2+
                 ","+setText3;
@@ -284,10 +236,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
         tvMetric0.setText(setText0);
         tvMetric1.setText(setText1);
-        tvMetric2.setText(setText2);
-        tvMetric3.setText(setText3);
+        tvMetric2.setText(setText4);
+        tvMetric3.setText(setText5);
 
-        plotData(met1);
+        plotData(speed, oppSpeed);
         BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
     }
 
@@ -300,23 +252,8 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
             //removes the 0x0A (NL) character
             byteToString = new String(byteArray, 0, byteArray.length-1, "UTF-8");
             Log.i("checkData", byteToString);
-        } catch (UnsupportedEncodingException  e){
+        } catch (UnsupportedEncodingException e){
             Log.e("StrX", e.toString());
-        }
-
-        String[] dataArray = byteToString.split(",");
-        switch (dataArray.length){
-            case 4:
-                tvLabel3.setText(dataArray[3]);
-            case 3:
-                tvLabel2.setText(dataArray[2]);
-            case 2:
-                tvLabel1.setText(dataArray[1]);
-            case 1:
-                tvLabel0.setText(dataArray[0]);
-                break;
-            default:
-
         }
 
         BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
@@ -341,9 +278,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     }
 
 
-    public static void plotData(float value){
-        Log.i("plotData", Float.toString(value));
-        mSeries.appendData(new DataPoint(graph2LastXValue, value), autoScrollX, maxPoints);
+    public static void plotData(float value1, float value2){
+        Log.i("plotData", Float.toString(value1));
+        mSeries.appendData(new DataPoint(graph2LastXValue, value1), autoScrollX, maxPoints);
+        mOppSeries.appendData(new DataPoint(graph2LastXValue, value2), autoScrollX, maxPoints);
         graph2LastXValue += 1d;
     }
 

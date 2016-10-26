@@ -37,7 +37,8 @@
         <activity android:name=".TrainingActivity" />
         <activity android:name=".PairingActivity" />
         <activity android:name=".DataListActivity" />
-        <activity android:name=".ERPSActivity"></activity>
+        <activity android:name=".ERPSActivity" />
+        <activity android:name=".RaceActivity"></activity>
     </application>
 
 </manifest>
