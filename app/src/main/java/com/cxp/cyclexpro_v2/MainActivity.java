@@ -93,7 +93,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                 startActivity(new Intent(this, cl));
                 break;
             case R.id.racebtn:
-                cl = MetricsActivity.class;
+                cl = RaceActivity.class;
                 startActivity(new Intent(this, cl));
                 break;
             case R.id.conbtn:
