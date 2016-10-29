@@ -288,14 +288,16 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         tvMetric3.setText(setText3);
 
         plotData(met1);
+
         BluetoothActivity.sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
+
     }
 
     public static void parseHeader(byte[] byteArray){
         Globals.sBuffer = byteArray;
         Globals.sNewData = true;
         String byteToString = "";
-        Log.d("H_array", Globals.getHexString(byteArray));
+        Log.d("H_array", Globals.getHexString(byteArray, byteArray.length));
         try{
             //removes the 0x0A (NL) character
             byteToString = new String(byteArray, 0, byteArray.length-1, "UTF-8");
@@ -345,6 +347,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         Log.i("plotData", Float.toString(value));
         mSeries.appendData(new DataPoint(graph2LastXValue, value), autoScrollX, maxPoints);
         graph2LastXValue += 1d;
+        Log.i("plotData", "Plotted");
     }
 
     public String makeFileName(String date, int session){

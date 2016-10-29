@@ -102,7 +102,7 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
             timerFinished = true;
             tvTimer.setText("Activated!");
 
-            Log.d("H_array", Globals.getHexString(byteArray));
+            Log.d("H_array", Globals.getHexString(byteArray, byteArray.length));
 
             //Latitude
             float latitude = ByteBuffer.wrap(byteArray, 0, 4)

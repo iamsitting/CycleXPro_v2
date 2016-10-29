@@ -6,9 +6,14 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.5.7
+2.6.0
 
 ### Most Recent Changes
+
+2.6.0
+- Tested Race Mode
+- Bluetooth buffer more stable
+- Updated messaging protocol
 
 2.5.7
 - Added Race Mode - untested

@@ -46,6 +46,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -297,6 +298,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private final DataInputStream dinput;
 
         public ConnectedThread(BluetoothSocket socket){
             mmSocket = socket;
@@ -310,6 +312,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
+            dinput = new DataInputStream(mmInStream);
         }
 
         /**
@@ -317,7 +320,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
          * Passes messages to the Handler
          */
         public void run(){
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[64];
             int bytes = 0;
             int begin = 0;//start of buffer iterator
             int start = 0;//start of message
@@ -330,124 +333,82 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             sConnectedThread.write(Constants.CONNECT_CONFIRM);
             while(true){
                 try{
-                    try{
-                        sleep(30);
-                    } catch (InterruptedException e){
-                        e.printStackTrace();
-                    }
 
-                    //Add bytes to buffer
-                    bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
+                    Log.d("Deb", "Reading...");
+                    dinput.readFully(buffer, 0, 32);
+                    Log.d("dinput", Globals.getHexString(buffer, 32));
 
-                    //iterate from begin to end acc. bytes
-                    bytechecker: for(int i =  begin; i < bytes; i++){
-                        //find terminating byte
-                        if((buffer[i] & 0xFF) == 0xA7){
-                            //terminating byte should be deep into the buffer
-                            Log.d("Deb", "Term!");
-                            if(i > 2){
-                                protocol = buffer[i-1]; //get protocol byte
-                                switch (protocol){
-                                    case Constants.IDLE_READ:
-                                        length = 7;
-                                        break;
-                                    case Constants.DATA_READ:
-                                        length = 20;
-                                        break;
-                                    case Constants.HEADER_READ:
-                                        length = 19;
-                                        break;
-                                    case Constants.ERPS_READ:
-                                        length = 8;
-                                        break;
-                                    case Constants.RACE_READ:
-                                        length = 28;
-                                        break;
-                                    default:
-                                        length = 0;
-                                }
-                                Log.d("len", Integer.toString(length));
-                                //starting index of received message within the buffer
-                                start = i - 2 - length;
-                                //make sure the starting index is not negative
-                                if(start >= 0){
-                                    //iterate through message for checksum
-                                    for(int j=0; j < length; j++){
-                                        checksum += (buffer[start+j] & 0xFF);
-                                    }
+                    //bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
+                    //bytes += buffer.length;
 
-                                    //compare checksums
-                                    if(( (byte) checksum ) == (buffer[i-2])){
+                    if(true) {
+                        if((buffer[0] & 0xFF) == 0xA7){
+                            switch (buffer[1]){
+                                case Constants.IDLE_READ:
+                                    length = 9;
+                                    break;
+                                case Constants.DATA_READ:
+                                    length = 22;
+                                    break;
+                                case Constants.HEADER_READ:
+                                    length = 30;
+                                    break;
+                                case Constants.ERPS_READ:
+                                    length = 10;
+                                    break;
+                                case Constants.RACE_READ:
+                                    length = 30;
+                                    break;
+                                default:
+                                    length = 0;
+                            }
+                            Log.d("len", Integer.toString(length));
+                            for(int j=0; j < length; j++){
+                                checksum += (buffer[j] & 0xFF);
+                            }
 
-                                        //checksum to line feed
-                                        buffer[i-2] = 0x0A;
-                                        if(!Globals.sERPSFlag){
-                                            switch(protocol){
-                                                case Constants.ERPS_READ:
-                                                    Log.d("ERPS", "Good");
-                                                    Globals.sERPSFlag = true;
-                                                    BluetoothActivity.sConnectedThread.flush();
-                                                    BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
-                                                    //send from start to protocol index
-                                                    Globals.sHandler
-                                                            .obtainMessage(protocol, start, i-1, buffer)
-                                                            .sendToTarget();
-                                                    break;
-                                                case Constants.HEADER_READ:
-                                                    if(!Globals.sGoodHeaderRead){
-                                                        Globals.sGoodHeaderRead = true;
-                                                        Globals.sHandler
-                                                                .obtainMessage(protocol, start, i-1, buffer)
-                                                                .sendToTarget();
-                                                    }
-                                                    break;
-                                                case Constants.DATA_READ:
-                                                case Constants.IDLE_READ:
-                                                case Constants.RACE_READ:
-                                                    Globals.sHandler
-                                                            .obtainMessage(protocol, start, i-1, buffer)
-                                                            .sendToTarget();
-                                                    //no break
-                                                default:
+                            if(( checksum & 0xFF) == (buffer[length] & 0xFF)){
 
+                                //checksum to line feed
+                                buffer[length] = 0x0A;
+                                if(!Globals.sERPSFlag){
+                                    switch(buffer[1]){
+                                        case Constants.ERPS_READ:
+                                            Log.d("ERPS", "Good");
+                                            Globals.sERPSFlag = true;
+                                            BluetoothActivity.sConnectedThread.flush();
+                                            BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
+                                            //send from start to protocol index
+                                            Globals.sHandler
+                                                    .obtainMessage(buffer[1], 2, length+1, buffer)
+                                                    .sendToTarget();
+                                            break;
+                                        case Constants.HEADER_READ:
+                                            if(!Globals.sGoodHeaderRead){
+                                                Globals.sGoodHeaderRead = true;
+                                                Globals.sHandler
+                                                        .obtainMessage(buffer[1], 2, length+1, buffer)
+                                                        .sendToTarget();
                                             }
+                                            break;
+                                        case Constants.DATA_READ:
+                                        case Constants.IDLE_READ:
+                                        case Constants.RACE_READ:
+                                            Globals.sHandler
+                                                    .obtainMessage(buffer[1], 2, length+1, buffer)
+                                                    .sendToTarget();
+                                            //no break
+                                        default:
 
-                                            /*
-                                            if(protocol == Constants.ERPS_READ){
-                                                Log.d("ERPS", "Good");
-                                                Globals.sERPSFlag = true;
-                                                BluetoothActivity.sConnectedThread.flush();
-                                                BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
-                                                //send from start to protocol index
-                                                Globals.sHandler
-                                                        .obtainMessage(protocol, start, i-1, buffer)
-                                                        .sendToTarget();
-                                            } else {
-                                                //send from start to protocol index
-                                                Globals.sHandler
-                                                        .obtainMessage(protocol, start, i-1, buffer)
-                                                        .sendToTarget();
-                                            }*/
-                                        }
-/*
-                                        if(protocol == Constants.HEADER_READ){
-                                            Globals.sGoodHeaderRead = true;
-                                        }*/
-                                        goodRead = true;
                                     }
-                                        checksum = 0;
                                 }
+
+                                goodRead = true;
                             }
-                            //if buffer fills up, start at the beginning
-                            begin = i + 1;
-                            if(i == (bytes-1)){
-                                bytes = 0;
-                                begin = 0;
-                            }
+                            checksum = 0;
                         }
                     }
-                    Log.d("bytes:", Integer.toString(bytes));
-                    Log.d("begin:", Integer.toString(begin));
+
                     //if transmission was good, reset
                     if(goodRead){
                         goodRead = false;
@@ -459,35 +420,8 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                         }
                         if(Globals.sSessionOn){
                             sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
-
-                        }
-                        if(misses > 5){
-                            bytes = 0;
-                            begin = 0;
-                            misses = 0;
-                        } else {
-                            if(bytes > 950){
-                                misses++;
-                            }
                         }
                     }
-                    /*
-                    if(protocol > 0){
-                        if(goodRead){
-                            goodRead = false;
-                            protocol = 0;
-                        } else { //else request a "resend"
-                            Log.d("Deb", "BadRead");
-                            if(protocol != Constants.ERPS_READ){
-                                if(!Globals.sGoodHeaderRead){
-                                    sConnectedThread.write(Constants.RETRY_NEW_SESSION);
-                                } else {
-                                    sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
-                                }
-                            }
-
-                        }
-                    } */
 
                 } catch (IOException e){
                     Log.e("BTthread", e.toString());
@@ -509,7 +443,9 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                 } catch (InterruptedException e){
                     e.printStackTrace();
                 }
-            } catch (IOException e) {}
+            } catch (IOException e) {
+                Log.e("Err", "bad write");
+            }
         }
 
         /** flushes output buffer

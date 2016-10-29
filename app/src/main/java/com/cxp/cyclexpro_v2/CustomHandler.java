@@ -46,21 +46,22 @@ public class CustomHandler extends Handler {
                 }
                 break;
             case Constants.IDLE_READ:
+                Log.d("Parse", "IDLE");
                 byte[] idleBuf = (byte[]) msg.obj;
+                Log.d("dinput", Globals.getHexString(idleBuf, msg.arg2));
                 //int blvl = idleBuf[msg.arg1];
-                TitleBarActivity.updateThreatIndicator((int) idleBuf[msg.arg1+1]);
                 TitleBarActivity.updateBatteryLvl((int) idleBuf[msg.arg1]);
+                TitleBarActivity.updateThreatIndicator((int) idleBuf[msg.arg1+1]);
                 //Log.i("BLVL", Integer.toString(blvl));
                 break;
             case Constants.DATA_READ:
                 byte[] dataBuf = (byte[]) msg.obj;
                 //msg.arg1 is battery
-                //msg.arg2 is protocol, don't want
                 //msg.arg2-1 is LF character, want
                 //int blvl2 = dataBuf[msg.arg1];
                 //battery
-                TitleBarActivity.updateThreatIndicator((int) dataBuf[msg.arg1+1]);
                 TitleBarActivity.updateBatteryLvl((int) dataBuf[msg.arg1]);
+                TitleBarActivity.updateThreatIndicator((int) dataBuf[msg.arg1+1]);
                 //Log.i("BLVL", Integer.toString(blvl2));
                 Log.i("Check", "parseData");
                 MetricsActivity.parseData( Arrays.copyOfRange(dataBuf, msg.arg1+2, msg.arg2));
@@ -90,8 +91,8 @@ public class CustomHandler extends Handler {
                 //msg.arg2 is protocol, don't want
                 //msg.arg2-1 is LF character, want
                 Log.i("Check", "parseRace");
-                TitleBarActivity.updateThreatIndicator((int) raceBuf[msg.arg1+1]);
                 TitleBarActivity.updateBatteryLvl((int) raceBuf[msg.arg1]);
+                TitleBarActivity.updateThreatIndicator((int) raceBuf[msg.arg1+1]);
                 RaceActivity.parseData(Arrays.copyOfRange(raceBuf, msg.arg1+2, msg.arg2));
                 break;
             //case Constants.XB_CONNECT:

@@ -53,6 +53,9 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_race);
+        sContext = getApplicationContext();
+        init();
+        ButtonInit();
     }
     /** initializes graphView object */
     void init(){
@@ -119,7 +122,7 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
                     if(BluetoothActivity.sConnectedThread != null){
                         Globals.sGoodHeaderRead = false;
                         Globals.sSessionOn = true;
-                        BluetoothActivity.sConnectedThread.write((Constants.SOLO_SESSION));
+                        BluetoothActivity.sConnectedThread.write((Constants.RACE_SESSION));
                     }
                     String name = makeFileName(savedDate, savedSession);
                     dl = new DataLogger(name, this);
@@ -247,7 +250,7 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
         Globals.sBuffer = byteArray;
         Globals.sNewData = true;
         String byteToString = "";
-        Log.d("H_array", Globals.getHexString(byteArray));
+        Log.d("H_array", Globals.getHexString(byteArray, byteArray.length));
         try{
             //removes the 0x0A (NL) character
             byteToString = new String(byteArray, 0, byteArray.length-1, "UTF-8");
