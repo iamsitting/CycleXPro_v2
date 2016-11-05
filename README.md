@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.6.1
+2.6.2
 
 ### Most Recent Changes
+
+2.6.2
+- Shared Preferences Updated
+- BT now sends user name and weight
 
 2.6.1
 - Added Settings Activity

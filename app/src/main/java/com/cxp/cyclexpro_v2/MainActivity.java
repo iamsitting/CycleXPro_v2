@@ -34,6 +34,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.audiofx.BassBoost;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -143,8 +144,12 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
 
     /** Loads the locally stored date and session number **/
     public void dateInit(){
-        Globals.memory = getSharedPreferences(Constants.PREFS_NAME, 0);
+        //Globals.memory = getSharedPreferences(Constants.PREFS_NAME, 0);
+        Globals.memory = PreferenceManager.getDefaultSharedPreferences(this);
         Globals.editor = Globals.memory.edit();
+
+        Globals.sUsername = Globals.memory.getString("user_name", "user123");
+        Globals.sWeight = Integer.parseInt(Globals.memory.getString("weight_input", "175"));
 
         String savedDate = Globals.memory.getString(Constants.PREFS_KEY_DATE,
                 Constants.DATE_NOT_EXISTS);

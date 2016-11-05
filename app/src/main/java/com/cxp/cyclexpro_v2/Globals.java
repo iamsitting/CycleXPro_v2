@@ -20,6 +20,9 @@ public class Globals {
     protected static CustomHandler sHandler;
     protected static SharedPreferences memory = null;
     protected static SharedPreferences.Editor editor;
+    protected static String sUsername = "null";
+    protected static int sWeight = 0;
+
 
     //DataLogger
     protected static boolean sNewData = false;
