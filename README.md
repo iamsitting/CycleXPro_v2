@@ -6,9 +6,12 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.6.0
+2.6.1
 
 ### Most Recent Changes
+
+2.6.1
+- Added Settings Activity
 
 2.6.0
 - Tested Race Mode

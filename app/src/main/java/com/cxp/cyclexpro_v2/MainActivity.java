@@ -32,6 +32,7 @@ package com.cxp.cyclexpro_v2;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.audiofx.BassBoost;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -123,7 +124,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.itemSettings:
-                                Toast.makeText(getApplicationContext(), "Setting page not done ", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
                                 break;
                             case R.id.itemPushData:
                                 startActivity(new Intent(MainActivity.this, DataListActivity.class));
