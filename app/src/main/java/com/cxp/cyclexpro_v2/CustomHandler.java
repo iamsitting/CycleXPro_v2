@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
@@ -15,6 +16,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
+
+import static com.cxp.cyclexpro_v2.TitleBarActivity.updateConBtn;
 
 /**
  * This is a JAVA class that defines the Handler.
@@ -46,10 +49,10 @@ public class CustomHandler extends Handler {
                 }
                 break;
             case Constants.IDLE_READ:
-                Log.d("Parse", "IDLE");
                 byte[] idleBuf = (byte[]) msg.obj;
-                Log.d("dinput", Globals.getHexString(idleBuf, msg.arg2));
+
                 //int blvl = idleBuf[msg.arg1];
+                Log.d("threat", Integer.toString((int) idleBuf[msg.arg1+1]));
                 TitleBarActivity.updateBatteryLvl((int) idleBuf[msg.arg1]);
                 TitleBarActivity.updateThreatIndicator((int) idleBuf[msg.arg1+1]);
                 //Log.i("BLVL", Integer.toString(blvl));

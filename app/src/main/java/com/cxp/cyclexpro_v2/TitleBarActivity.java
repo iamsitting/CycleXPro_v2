@@ -71,6 +71,8 @@ public class TitleBarActivity extends Activity {
         updateConBtn();
 
         btMenu = (Button) findViewById(R.id.btMenu);
+        updateThreatIndicator(0);
+        threatOn = false;
     }
 
     @Override
@@ -86,13 +88,16 @@ public class TitleBarActivity extends Activity {
     }*/
 
     public static void updateThreatIndicator(int val){
+        //Run this on the UI Thread
         if(val == 1){
             if(!threatOn){
+                threatOn = true;
                 tvThreatIndicator.setText("!!");
                 tvThreatIndicator.setTextColor(Color.RED);
             }
         } else {
             if(threatOn){
+                threatOn = false;
                 tvThreatIndicator.setText("OK");
                 tvThreatIndicator.setTextColor(Color.GRAY);
             }

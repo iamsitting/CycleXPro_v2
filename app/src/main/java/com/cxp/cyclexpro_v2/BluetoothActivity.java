@@ -329,7 +329,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             int protocol = 0;
             boolean goodRead = false;
             int misses = 0;
-            String connect_confirm = 'C'+ String.format("%03d",Integer.toString(Globals.sWeight))+
+            String connect_confirm = 'C'+ String.format("%03d",Globals.sWeight)+
                 Globals.sUsername+'\n';
 
             sConnectedThread.write(connect_confirm);

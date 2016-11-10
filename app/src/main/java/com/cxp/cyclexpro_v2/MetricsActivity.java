@@ -331,6 +331,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         df.setTimeZone(tz);
         String nowAsISO = df.format(new Date());
 
+        //do if dl.exists()
         dl.stopWriting();
         while (dl.isAlive()) {//TODO: Add timeout
             dl.finishLog();

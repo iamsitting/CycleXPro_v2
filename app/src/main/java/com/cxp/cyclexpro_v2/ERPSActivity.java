@@ -64,7 +64,7 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
     public void activateERPS(String latitude, String longitude){
 
         //TODO: phoneNo must come from saved emergency contacts
-        String phoneNo = "8327907387";
+        String phoneNo = "8172129515";
         String message = timeOfAccident+": Carlos has been in an accident. See: "
                 + "http://maps.google.com/maps?q="
                 +latitude

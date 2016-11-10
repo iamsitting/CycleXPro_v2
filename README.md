@@ -6,9 +6,14 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.6.2
+2.6.3
 
 ### Most Recent Changes
+
+2.6.3
+- Send Name Tested
+- Threat Indicator Tested
+- ALS Done!
 
 2.6.2
 - Shared Preferences Updated
