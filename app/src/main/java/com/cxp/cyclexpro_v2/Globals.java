@@ -22,6 +22,11 @@ public class Globals {
     protected static SharedPreferences.Editor editor;
     protected static String sUsername = "null";
     protected static int sWeight = 0;
+    protected static String sContact = "8888888888";
+    //TODO: Update these in the MainActivity
+    protected static String sMyTRIOid = "1";
+    protected static String sDestTRIOid = "2";
+
 
 
     //DataLogger

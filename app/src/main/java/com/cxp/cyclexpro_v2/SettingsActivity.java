@@ -178,6 +178,7 @@ public class SettingsActivity extends PreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("user_name"));
             bindPreferenceSummaryToValue(findPreference("weight_input"));
+            bindPreferenceSummaryToValue(findPreference("emergency_contacts"));
             bindPreferenceSummaryToValue(findPreference("example_list"));
         }
 
@@ -208,7 +209,8 @@ public class SettingsActivity extends PreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("trio_settings"));
+            bindPreferenceSummaryToValue(findPreference("my_trio_id"));
+            bindPreferenceSummaryToValue(findPreference("dest_trio_id"));
         }
 
         @Override

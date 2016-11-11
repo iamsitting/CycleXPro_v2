@@ -150,6 +150,7 @@ public class MainActivity extends TitleBarActivity implements View.OnClickListen
 
         Globals.sUsername = Globals.memory.getString("user_name", "user123");
         Globals.sWeight = Integer.parseInt(Globals.memory.getString("weight_input", "175"));
+        Globals.sContact = Globals.memory.getString("emergency_contacts", "8888888888");
 
         String savedDate = Globals.memory.getString(Constants.PREFS_KEY_DATE,
                 Constants.DATE_NOT_EXISTS);

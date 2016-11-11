@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.6.3
+2.6.4
 
 ### Most Recent Changes
+
+2.6.4
+- Updated ERPS to use stored contact
+- Added TRIO settings
 
 2.6.3
 - Send Name Tested

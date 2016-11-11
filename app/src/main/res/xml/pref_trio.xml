@@ -4,12 +4,26 @@
     <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
     <EditTextPreference
         android:capitalize="words"
-        android:defaultValue="@string/pref_default_display_name"
-        android:inputType="textCapWords"
-        android:key="trio_settings"
+        android:defaultValue="1"
+        android:key="my_trio_id"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"
-        android:title="Trio ID" />
+        android:title="My Trio ID"
+        android:inputType="numberDecimal"
+        android:maxLength="2" />
+
+    <!-- NOTE: EditTextPreference accepts EditText attributes. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <EditTextPreference
+        android:capitalize="words"
+        android:defaultValue="2"
+        android:inputType="numberDecimal"
+        android:key="dest_trio_id"
+        android:maxLines="1"
+        android:selectAllOnFocus="true"
+        android:singleLine="true"
+        android:title="Remote Trio ID"
+        android:maxLength="2" />
 
 </PreferenceScreen>

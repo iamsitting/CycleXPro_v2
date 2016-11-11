@@ -63,21 +63,27 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
 
     public void activateERPS(String latitude, String longitude){
 
-        //TODO: phoneNo must come from saved emergency contacts
-        String phoneNo = "8172129515";
-        String message = timeOfAccident+": Carlos has been in an accident. See: "
-                + "http://maps.google.com/maps?q="
-                +latitude
-                +","+longitude;
-        //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-        try {
-            SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(phoneNo, null, message, null, null);
-            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-            BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "SMS failed!", Toast.LENGTH_LONG).show();
-            e.printStackTrace();
+        String phoneNo = Globals.sContact;
+        String username = Globals.sUsername;
+
+        if(phoneNo.equals("8888888888")){
+            Toast.makeText(getApplicationContext(), "Not Sending SMS. Update Contacts!!", Toast.LENGTH_LONG).show();
+        } else {
+
+            String message = timeOfAccident+": "+username+" has been in an accident. See: "
+                    + "http://maps.google.com/maps?q="
+                    +latitude
+                    +","+longitude;
+            //Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            try {
+                SmsManager smsManager = SmsManager.getDefault();
+                smsManager.sendTextMessage(phoneNo, null, message, null, null);
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+                BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), "SMS failed!", Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
         }
     }
 
