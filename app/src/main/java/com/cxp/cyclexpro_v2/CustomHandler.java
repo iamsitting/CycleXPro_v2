@@ -98,8 +98,17 @@ public class CustomHandler extends Handler {
                 TitleBarActivity.updateThreatIndicator((int) raceBuf[msg.arg1+1]);
                 RaceActivity.parseData(Arrays.copyOfRange(raceBuf, msg.arg1+2, msg.arg2));
                 break;
-            //case Constants.XB_CONNECT:
-            //    Globals.sXbConnected = true;
+            case Constants.XB_CONNECT:
+                byte[] xbBuf = (byte[]) msg.obj;
+                Log.d("threat", Integer.toString((int) xbBuf[msg.arg1+1]));
+                TitleBarActivity.updateBatteryLvl((int) xbBuf[msg.arg1]);
+                TitleBarActivity.updateThreatIndicator((int) xbBuf[msg.arg1+1]);
+                Globals.sMyTRIOid = new String(Arrays.copyOfRange(xbBuf, msg.arg1+2, msg.arg2));
+                Log.d("xb", Globals.sMyTRIOid);
+                Globals.editor.putString("my_trio_id", Globals.sMyTRIOid);
+                Globals.editor.apply();
+
+                break;
             default:
                 Log.i("msg.what", Integer.toString(msg.what));
         }

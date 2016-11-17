@@ -330,7 +330,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             boolean goodRead = false;
             int misses = 0;
             String connect_confirm = 'C'+ String.format("%03d",Globals.sWeight)+
-                Globals.sUsername+'\n';
+                Globals.sUsername+'\n'+Globals.sDestTRIOid+'\n';
 
             sConnectedThread.write(connect_confirm);
             while(true){
@@ -361,6 +361,9 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                 case Constants.RACE_READ:
                                     length = 30;
                                     break;
+                                case Constants.XB_CONNECT:
+                                    length = 12;
+                                    break;
                                 default:
                                     length = 0;
                             }
@@ -370,7 +373,6 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                             }
 
                             if(( checksum & 0xFF) == (buffer[length] & 0xFF)){
-
                                 //checksum to line feed
                                 buffer[length] = 0x0A;
                                 if(!Globals.sERPSFlag){
@@ -393,6 +395,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                                         .sendToTarget();
                                             }
                                             break;
+                                        case Constants.XB_CONNECT:
                                         case Constants.DATA_READ:
                                         case Constants.IDLE_READ:
                                         case Constants.RACE_READ:

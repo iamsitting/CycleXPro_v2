@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.6.4
+2.6.5
 
 ### Most Recent Changes
+
+2.6.5
+- Added XB_CONNECT protocol
+- My_trio_id is read-only
 
 2.6.4
 - Updated ERPS to use stored contact
