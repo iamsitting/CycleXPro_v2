@@ -38,8 +38,8 @@ public final class Constants {
     /** Modes */
     protected static final int MODE_NONE = 0;
     protected static final int MODE_SOLO = 1;
-    protected static final int MODE_TRAINEE = 2;
-    protected static final int MODE_TRAINER = 3;
+    protected static final int MODE_ATHLETE = 2;
+    protected static final int MODE_COACH = 3;
     protected static final int MODE_RACE = 4;
     /** CXP Protocols */
     protected static final int SUCCESS_CONNECT = 63;
@@ -57,8 +57,8 @@ public final class Constants {
     protected static final String SEND_NEXT_SAMPLE = "K\n";
     protected static final String RETRY_NEW_SESSION = "N\n";
     protected static final String SOLO_SESSION = "W\n";
-    protected static final String TRAINEE_SESSION = "X\n";
-    protected static final String TRAINER_SESSION = "Y\n";
+    protected static final String ATHLETE_SESSION = "X\n";
+    protected static final String COACH_SESSION = "Y\n";
     protected static final String RACE_SESSION = "Z\n";
 
     protected static final String XB_PAIR = "XB\n";

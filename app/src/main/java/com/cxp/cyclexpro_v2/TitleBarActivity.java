@@ -32,6 +32,8 @@ package com.cxp.cyclexpro_v2;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -51,7 +53,10 @@ public class TitleBarActivity extends Activity {
     protected static TextView tvBatteryLevel, tvThreatIndicator;
     protected Button btMenu;
     protected static boolean threatOn = false;
-
+    public static Handler UIHandler;
+    static {
+        UIHandler = new Handler(Looper.getMainLooper());
+    }
     /** creates title bar with button and textView */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,38 +94,59 @@ public class TitleBarActivity extends Activity {
 
     public static void updateThreatIndicator(int val){
         //Run this on the UI Thread
-        if(val == 1){
-            if(!threatOn){
-                threatOn = true;
-                tvThreatIndicator.setText("!!");
-                tvThreatIndicator.setTextColor(Color.RED);
+        final int x = val;
+        Runnable r  = new Runnable() {
+            @Override
+            public void run() {
+                if(x == 1){
+                    if(!threatOn){
+                        threatOn = true;
+                        tvThreatIndicator.setText("!!");
+                        tvThreatIndicator.setTextColor(Color.RED);
+                    }
+                } else {
+                    if(threatOn){
+                        threatOn = false;
+                        tvThreatIndicator.setText("OK");
+                        tvThreatIndicator.setTextColor(Color.GRAY);
+                    }
+                }
             }
-        } else {
-            if(threatOn){
-                threatOn = false;
-                tvThreatIndicator.setText("OK");
-                tvThreatIndicator.setTextColor(Color.GRAY);
-            }
-        }
+        };
+        runOnUI(r);
     }
 
     public static void updateBatteryLvl(int val){
-        tvBatteryLevel.setText(Integer.toString(val)+"%");
+        final int x = val;
+        Runnable r  = new Runnable() {
+            @Override
+            public void run() {
+                tvBatteryLevel.setText(Integer.toString(x)+"%");
+            }
+        };
+        runOnUI(r);
     }
 
     public static void updateConBtn(){
-        Log.i("Check", String.valueOf(Globals.sBtConnected));
-        if (Globals.sBtConnected){
-            btBtConnection.setBackgroundResource(R.drawable.ic_bluetooth_connect_white_36dp);
+        Runnable r  = new Runnable() {
+            @Override
+            public void run() {
+                Log.i("Check", String.valueOf(Globals.sBtConnected));
+                if (Globals.sBtConnected){
+                    btBtConnection.setBackgroundResource(R.drawable.ic_bluetooth_connect_white_36dp);
 
-        }
-        else{
-            btBtConnection.setBackgroundResource(R.drawable.ic_bluetooth_off_grey600_36dp);
+                }
+                else{
+                    btBtConnection.setBackgroundResource(R.drawable.ic_bluetooth_off_grey600_36dp);
 
-        }
-        btBtConnection.invalidate();
+                }
+                btBtConnection.invalidate();
+            }
+        };
+        runOnUI(r);
     }
 
-
-
+    public static void runOnUI(Runnable runnable) {
+        UIHandler.post(runnable);
+    }
 }

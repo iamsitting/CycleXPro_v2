@@ -30,6 +30,7 @@
 
 package com.cxp.cyclexpro_v2;
 
+import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
@@ -37,7 +38,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -45,6 +49,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -69,41 +78,60 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
     ArrayList<BluetoothDevice> devices;
     IntentFilter filter;
     BroadcastReceiver receiver;
+    private static Context context;
+    static ProgressDialog progressDialog;
+    static Runnable progShow, progDismiss;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bluetooth);
         init();
-        if(sBtAdapter == null){
+        context = this.getApplicationContext();
+        if (sBtAdapter == null) {
             Toast.makeText(getApplicationContext(), "No BT detected", Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            if(!sBtAdapter.isEnabled()){
+            if (!sBtAdapter.isEnabled()) {
                 turnOnBT();
             }
             getPairedDevices();
             startDiscovery();
         }
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
-    /** Puts Bluetooth in Discovery Mode */
-    private void startDiscovery(){
+    /**
+     * Puts Bluetooth in Discovery Mode
+     */
+    private void startDiscovery() {
         sBtAdapter.cancelDiscovery();
         sBtAdapter.startDiscovery();
     }
 
-    /** Enables Bluetooth */
-    private void turnOnBT(){
+    /**
+     * Enables Bluetooth
+     */
+    private void turnOnBT() {
         Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
         startActivityForResult(intent, 1);
     }
 
-    /** list of BT devices to list of paired devices */
-    private void getPairedDevices(){
+    /**
+     * list of BT devices to list of paired devices
+     */
+    private void getPairedDevices() {
         devicesArray = sBtAdapter.getBondedDevices();
-        if(devicesArray.size() > 0){
-            for(BluetoothDevice device:devicesArray){
+        if (devicesArray.size() > 0) {
+            for (BluetoothDevice device : devicesArray) {
                 Log.i("Check", device.getName());
                 pairedDevices.add(device.getName());
             }
@@ -112,9 +140,10 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
     }
 
 
-
-    /** Initializes Views and Adapter */
-    private void init(){
+    /**
+     * Initializes Views and Adapter
+     */
+    private void init() {
         this.tvTitle.setText("Bluetooth Devices");
         listView = (ListView) findViewById(R.id.listView);
         listView.setOnItemClickListener(this);
@@ -124,6 +153,26 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
         pairedDevices = new ArrayList<>();
         filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         devices = new ArrayList<>();
+
+
+        progressDialog = new ProgressDialog(BluetoothActivity.this);
+        progressDialog.setTitle("Connecting");
+        progressDialog.setMessage("Connecting to Cycle X-Pro...");
+
+        progShow = new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.show();
+            }
+        };
+
+        progDismiss = new Runnable() {
+            @Override
+            public void run() {
+                progressDialog.dismiss();
+            }
+        };
+
         Log.i("Check", "BT init");
 
         receiver = new BroadcastReceiver() {
@@ -134,26 +183,26 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                 String action = intent.getAction();
                 Log.i("Check Action", action);
 
-                if(BluetoothDevice.ACTION_FOUND.equals(action)){
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     Log.i("Check", "DeviceFound");
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     devices.add(device);
                     String s = "";
-                    for(int a = 0; a < pairedDevices.size(); a++){
-                        if((device.getName() != null) && (device.getName().length() > 0)){
-                            if(device.getName().equals(pairedDevices.get(a))){
+                    for (int a = 0; a < pairedDevices.size(); a++) {
+                        if ((device.getName() != null) && (device.getName().length() > 0)) {
+                            if (device.getName().equals(pairedDevices.get(a))) {
                                 s = "(Paired)";
                                 break;
                             }
                         }
                     }
-                    listAdapter.add(device.getName()+" "+s+" "+"\n"+device.getAddress());
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)){
+                    listAdapter.add(device.getName() + " " + s + " " + "\n" + device.getAddress());
+                } else if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
 
-                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)){
+                } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
 
-                } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)){
-                    if(sBtAdapter.getState() == sBtAdapter.STATE_OFF){
+                } else if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
+                    if (sBtAdapter.getState() == sBtAdapter.STATE_OFF) {
                         turnOnBT();
                     }
                 }
@@ -170,43 +219,82 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
-        try{
+        try {
             unregisterReceiver(receiver);
-        } catch (IllegalArgumentException ex){
+        } catch (IllegalArgumentException ex) {
             Log.w("Unreg", ex.toString());
         }
 
     }
 
-    /** If connection is cancelled, Toast tells user to turn on BT */
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+    /**
+     * If connection is cancelled, Toast tells user to turn on BT
+     */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_CANCELED){
+        if (resultCode == RESULT_CANCELED) {
             Toast.makeText(getApplicationContext(), "Bluetooth must be enabled to continue", Toast.LENGTH_SHORT).show();
             finish();
         }
     }
 
     /**
-     * @param arg2  the index of the chosen paired device
-     * paired device is passed to the ConnectThread
+     * @param arg2 the index of the chosen paired device
+     *             paired device is passed to the ConnectThread
      */
     @Override
-    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3){
+    public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
         Log.i("Check", "onItemClick");
-        if(sBtAdapter.isDiscovering()){
+        if (sBtAdapter.isDiscovering()) {
             sBtAdapter.cancelDiscovery();
         }
-        if(listAdapter.getItem(arg2).contains("(Paired)")){
+        if (listAdapter.getItem(arg2).contains("(Paired)")) {
             BluetoothDevice selectedDevice = devices.get(arg2);
             Log.i("Check", selectedDevice.getName());
             ConnectThread connect = new ConnectThread(selectedDevice);
             connect.start();
+            this.runOnUiThread(progShow);
         } else {
             Toast.makeText(getApplicationContext(), "device is not paired", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Bluetooth Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        AppIndex.AppIndexApi.start(client, getIndexApiAction());
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        AppIndex.AppIndexApi.end(client, getIndexApiAction());
+        client.disconnect();
     }
 
     /**
@@ -218,7 +306,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
         private final boolean secure;
         private boolean fallback;
 
-        public ConnectThread(BluetoothDevice device){
+        public ConnectThread(BluetoothDevice device) {
             BluetoothSocket tmp = null;
             mmDevice = device;
             secure = true;
@@ -228,46 +316,42 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                 if (secure) tmp = mmDevice.createRfcommSocketToServiceRecord(Constants.MY_UUID);
                 else tmp = mmDevice.createInsecureRfcommSocketToServiceRecord(Constants.MY_UUID);
 
-            } catch(IOException e){
+            } catch (IOException e) {
                 Log.e("ConnectThread", "Error:", e);
             }
             mmSocket = tmp;
         }
 
-        /** Attempts to establish a Bluetooth connection */
-        public void run(){
+        /**
+         * Attempts to establish a Bluetooth connection
+         */
+        public void run() {
             sBtAdapter.cancelDiscovery();
 
-            try{
+            try {
                 //for some reason, it sometimes doesn't work
                 mmSocket.connect();
                 Log.i("Check", "socket connected");
-            } catch (IOException connectException){
+            } catch (IOException connectException) {
                 Log.e("ConnectThread", "connect IOException: ", connectException);
                 //added
-                try{
+                try {
                     mmSocket = (BluetoothSocket) mmDevice.getClass()
-                            .getMethod("createRfcommSocket", new Class[] {int.class})
-                            .invoke(mmDevice,1);
+                            .getMethod("createRfcommSocket", new Class[]{int.class})
+                            .invoke(mmDevice, 1);
                     mmSocket.connect();
 
                     Log.i("Check", "Successful Connection ONE!");
 
-                } catch (Exception e2){
+                } catch (Exception e2) {
                     Log.e("No FBConnection", "e2", e2);
 
                 }
             }
             if (mmSocket.isConnected()) Log.i("Check", "Successful Connection TWO!");
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Globals.sBtConnected = true;
-                    updateConBtn();
-                    //updateConnectionStatus(true);
-                }
-            });
+            Globals.sBtConnected = true;
+            updateConBtn();
 
             if (fallback) {
                 Globals.sHandler
@@ -281,13 +365,16 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             }
         }
 
-        /** Cancels the Bluetooth connection */
-        public void cancel(){
-            try{
+        /**
+         * Cancels the Bluetooth connection
+         */
+        public void cancel() {
+            try {
                 if (fallback) mmSocket.close();
                 else mmSocket.close();
 
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
     }
 
@@ -300,15 +387,17 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
         private final OutputStream mmOutStream;
         private final DataInputStream dinput;
 
-        public ConnectedThread(BluetoothSocket socket){
+        public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
-            try{
+
+            try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
@@ -319,22 +408,20 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
          * Reads bytes from Bluetooth socket
          * Passes messages to the Handler
          */
-        public void run(){
+        public void run() {
             byte[] buffer = new byte[64];
-            int bytes = 0;
-            int begin = 0;//start of buffer iterator
-            int start = 0;//start of message
             int checksum = 0;
             int length = 0;
             int protocol = 0;
+            int time = 0;
             boolean goodRead = false;
             int misses = 0;
-            String connect_confirm = 'C'+ String.format("%03d",Globals.sWeight)+
-                Globals.sUsername+'\n'+Globals.sDestTRIOid+'\n';
 
+            String connect_confirm = 'C' + String.format("%03d", Globals.sWeight) +
+                    Globals.sUsername + '\n' + Globals.sDestTRIOid + '\n';
             sConnectedThread.write(connect_confirm);
-            while(true){
-                try{
+            while (true) {
+                try {
 
                     Log.d("Deb", "Reading...");
                     dinput.readFully(buffer, 0, 32);
@@ -343,9 +430,9 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                     //bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
                     //bytes += buffer.length;
 
-                    if(true) {
-                        if((buffer[0] & 0xFF) == 0xA7){
-                            switch (buffer[1]){
+                    if (true) {
+                        if ((buffer[0] & 0xFF) == 0xA7) {
+                            switch (buffer[1]) {
                                 case Constants.IDLE_READ:
                                     length = 9;
                                     break;
@@ -368,15 +455,15 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                     length = 0;
                             }
                             Log.d("len", Integer.toString(length));
-                            for(int j=0; j < length; j++){
+                            for (int j = 0; j < length; j++) {
                                 checksum += (buffer[j] & 0xFF);
                             }
 
-                            if(( checksum & 0xFF) == (buffer[length] & 0xFF)){
+                            if ((checksum & 0xFF) == (buffer[length] & 0xFF)) {
                                 //checksum to line feed
                                 buffer[length] = 0x0A;
-                                if(!Globals.sERPSFlag){
-                                    switch(buffer[1]){
+                                if (!Globals.sERPSFlag) {
+                                    switch (buffer[1]) {
                                         case Constants.ERPS_READ:
                                             Log.d("ERPS", "Good");
                                             Globals.sERPSFlag = true;
@@ -384,23 +471,24 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                             BluetoothActivity.sConnectedThread.write(Constants.ERPS_ACK);
                                             //send from start to protocol index
                                             Globals.sHandler
-                                                    .obtainMessage(buffer[1], 2, length+1, buffer)
+                                                    .obtainMessage(buffer[1], 2, length + 1, buffer)
                                                     .sendToTarget();
                                             break;
                                         case Constants.HEADER_READ:
-                                            if(!Globals.sGoodHeaderRead){
+                                            if (!Globals.sGoodHeaderRead) {
                                                 Globals.sGoodHeaderRead = true;
                                                 Globals.sHandler
-                                                        .obtainMessage(buffer[1], 2, length+1, buffer)
+                                                        .obtainMessage(buffer[1], 2, length + 1, buffer)
                                                         .sendToTarget();
                                             }
                                             break;
                                         case Constants.XB_CONNECT:
+                                            runOnUI(progDismiss);
                                         case Constants.DATA_READ:
                                         case Constants.IDLE_READ:
                                         case Constants.RACE_READ:
                                             Globals.sHandler
-                                                    .obtainMessage(buffer[1], 2, length+1, buffer)
+                                                    .obtainMessage(buffer[1], 2, length + 1, buffer)
                                                     .sendToTarget();
                                             //no break
                                         default:
@@ -415,20 +503,20 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                     }
 
                     //if transmission was good, reset
-                    if(goodRead){
+                    if (goodRead) {
                         goodRead = false;
                     } else {
                         Log.d("Deb", "BadRead");
                         Log.d("Misses", Integer.toString(misses));
-                        if(!Globals.sGoodHeaderRead){
+                        if (!Globals.sGoodHeaderRead) {
                             sConnectedThread.write(Constants.RETRY_NEW_SESSION);
                         }
-                        if(Globals.sSessionOn){
+                        if (Globals.sSessionOn) {
                             sConnectedThread.write(Constants.SEND_NEXT_SAMPLE);
                         }
                     }
 
-                } catch (IOException e){
+                } catch (IOException e) {
                     Log.e("BTthread", e.toString());
                     break;
                 }
@@ -436,16 +524,19 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             Log.d("Force", "Should never print");
         }
 
-        /** Writes string to Bluetooth socket
-         * @param income    message is a string
-         * string is converted to byte array */
-        public void write(String income){
-            byte [] data = income.getBytes();
-            try{
-                mmOutStream.write(data,0, data.length);
-                try{
+        /**
+         * Writes string to Bluetooth socket
+         *
+         * @param income message is a string
+         *               string is converted to byte array
+         */
+        public void write(String income) {
+            byte[] data = income.getBytes();
+            try {
+                mmOutStream.write(data, 0, data.length);
+                try {
                     Thread.sleep(20);
-                } catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             } catch (IOException e) {
@@ -453,36 +544,41 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             }
         }
 
-        /** flushes output buffer
+        /**
+         * flushes output buffer
          **/
-        public void flush(){
-            try{
+        public void flush() {
+            try {
                 mmOutStream.flush();
-                try{
+                try {
                     Thread.sleep(20);
-                } catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
 
-        /** Closes Bluetooth socket */
-        public void cancel(){
-            try{
+        /**
+         * Closes Bluetooth socket
+         */
+        public void cancel() {
+            try {
                 mmSocket.close();
-            } catch (IOException e){}
+            } catch (IOException e) {
+            }
         }
     }
 
-    /** calls the connectedThread.cancel method */
-    public static void disconnect(){
-        if(sConnectedThread != null){
+    /**
+     * calls the connectedThread.cancel method
+     */
+    public static void disconnect() {
+        if (sConnectedThread != null) {
             sConnectedThread.cancel();
-            sConnectedThread=null;
+            sConnectedThread = null;
             Globals.sBtConnected = false;
             updateConBtn();
-            //TODO: Fix BT icon to update on disconnect
-            //updateConnectionStatus(false);
         }
     }
 

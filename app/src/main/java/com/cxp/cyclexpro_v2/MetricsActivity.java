@@ -113,12 +113,12 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 Globals.sMode = Constants.MODE_SOLO;
                 break;
             case "TRAINER":
-                this.tvTitle.setText("Cyclist's Metrics");
-                Globals.sMode = Constants.MODE_TRAINER;
+                this.tvTitle.setText("Athlete's Metrics");
+                Globals.sMode = Constants.MODE_COACH;
                 break;
-            case "TRAINEE":
+            case "ATHLETE":
                 this.tvTitle.setText("Your Metrics");
-                Globals.sMode = Constants.MODE_TRAINEE;
+                Globals.sMode = Constants.MODE_ATHLETE;
                 break;
         }
 
@@ -180,7 +180,18 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                     if(BluetoothActivity.sConnectedThread != null){
                         Globals.sGoodHeaderRead = false;
                         Globals.sSessionOn = true;
-                        BluetoothActivity.sConnectedThread.write((Constants.SOLO_SESSION));
+                        switch (Globals.sMode){
+                            case Constants.MODE_SOLO:
+                                BluetoothActivity.sConnectedThread.write((Constants.SOLO_SESSION));
+                                break;
+                            case Constants.MODE_COACH:
+                                BluetoothActivity.sConnectedThread.write((Constants.COACH_SESSION));
+                                break;
+                            case Constants.MODE_ATHLETE:
+                                BluetoothActivity.sConnectedThread.write((Constants.ATHLETE_SESSION));
+                                break;
+                        }
+
                     }
                     String name = makeFileName(savedDate, savedSession);
                     dl = new DataLogger(name, this);

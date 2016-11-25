@@ -43,7 +43,7 @@ public class CustomHandler extends Handler {
                     BluetoothActivity.sConnectedThread =
                             new BluetoothActivity.ConnectedThread(
                                     (BluetoothSocket) msg.obj);
-                    Toast.makeText(con, "Connected!",
+                    Toast.makeText(con, "Setting Up Cycle X-Pro!",
                             Toast.LENGTH_SHORT).show();
                     BluetoothActivity.sConnectedThread.start();
                 }
@@ -107,6 +107,7 @@ public class CustomHandler extends Handler {
                 Log.d("xb", Globals.sMyTRIOid);
                 Globals.editor.putString("my_trio_id", Globals.sMyTRIOid);
                 Globals.editor.apply();
+                Globals.sXbConnected = true;
 
                 break;
             default:
