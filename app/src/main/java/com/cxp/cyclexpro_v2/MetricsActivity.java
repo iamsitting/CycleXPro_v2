@@ -112,7 +112,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 this.tvTitle.setText("Your Metrics");
                 Globals.sMode = Constants.MODE_SOLO;
                 break;
-            case "TRAINER":
+            case "COACH":
                 this.tvTitle.setText("Athlete's Metrics");
                 Globals.sMode = Constants.MODE_COACH;
                 break;
