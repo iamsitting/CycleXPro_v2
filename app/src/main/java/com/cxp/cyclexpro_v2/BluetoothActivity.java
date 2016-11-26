@@ -417,6 +417,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
             boolean goodRead = false;
             int misses = 0;
 
+            runOnUI(progShow);
             String connect_confirm = 'C' + String.format("%03d", Globals.sWeight) +
                     Globals.sUsername + '\n' + Globals.sDestTRIOid + '\n';
             sConnectedThread.write(connect_confirm);
@@ -434,7 +435,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                         if ((buffer[0] & 0xFF) == 0xA7) {
                             switch (buffer[1]) {
                                 case Constants.IDLE_READ:
-                                    length = 10;
+                                    length = 9;
                                     break;
                                 case Constants.COACH_READ:
                                 case Constants.DATA_READ:
@@ -453,7 +454,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                     //length = 17;
                                     //break;
                                 case Constants.XB_CONNECT:
-                                    length = 12;
+                                    length = 13;
                                     break;
                                 default:
                                     length = 0;

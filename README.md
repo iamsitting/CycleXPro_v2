@@ -6,9 +6,12 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.7.1
+2.7.2
 
 ### Most Recent Changes
+
+2.7.2
+- Bugfix: XB_Connect protocol message
 
 2.7.1
 - Updated messaging protocol
