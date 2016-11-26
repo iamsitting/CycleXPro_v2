@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.7.0
+2.7.1
 
 ### Most Recent Changes
+
+2.7.1
+- Updated messaging protocol
+- Added Coach mode to protocol
 
 2.7.0
 - UI is more responsive

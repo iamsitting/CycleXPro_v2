@@ -53,6 +53,7 @@ public class TitleBarActivity extends Activity {
     protected static TextView tvBatteryLevel, tvThreatIndicator;
     protected Button btMenu;
     protected static boolean threatOn = false;
+    protected static boolean chargeOn = false;
     public static Handler UIHandler;
     static {
         UIHandler = new Handler(Looper.getMainLooper());
@@ -122,6 +123,27 @@ public class TitleBarActivity extends Activity {
             @Override
             public void run() {
                 tvBatteryLevel.setText(Integer.toString(x)+"%");
+            }
+        };
+        runOnUI(r);
+    }
+
+    public static void updateChargeStatus(int val){
+        final int x = val;
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if(x == 1){
+                    if(!chargeOn){
+                        chargeOn = true;
+                        tvBatteryLevel.setTextColor(Color.GREEN);
+                    }
+                } else {
+                    if(chargeOn){
+                        chargeOn = false;
+                        tvBatteryLevel.setTextColor(Color.WHITE);
+                    }
+                }
             }
         };
         runOnUI(r);

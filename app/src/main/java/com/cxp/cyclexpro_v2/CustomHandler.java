@@ -55,8 +55,10 @@ public class CustomHandler extends Handler {
                 Log.d("threat", Integer.toString((int) idleBuf[msg.arg1+1]));
                 TitleBarActivity.updateBatteryLvl((int) idleBuf[msg.arg1]);
                 TitleBarActivity.updateThreatIndicator((int) idleBuf[msg.arg1+1]);
+                TitleBarActivity.updateChargeStatus((int) idleBuf[msg.arg1+2]);
                 //Log.i("BLVL", Integer.toString(blvl));
                 break;
+            case Constants.COACH_READ:
             case Constants.DATA_READ:
                 byte[] dataBuf = (byte[]) msg.obj;
                 //msg.arg1 is battery
@@ -65,9 +67,9 @@ public class CustomHandler extends Handler {
                 //battery
                 TitleBarActivity.updateBatteryLvl((int) dataBuf[msg.arg1]);
                 TitleBarActivity.updateThreatIndicator((int) dataBuf[msg.arg1+1]);
-                //Log.i("BLVL", Integer.toString(blvl2));
+                TitleBarActivity.updateChargeStatus((int) dataBuf[msg.arg1+2]);
                 Log.i("Check", "parseData");
-                MetricsActivity.parseData( Arrays.copyOfRange(dataBuf, msg.arg1+2, msg.arg2));
+                MetricsActivity.parseData( Arrays.copyOfRange(dataBuf, msg.arg1+3, msg.arg2));
                 break;
             case Constants.HEADER_READ:
                 byte[] headerBuf = (byte[]) msg.obj;
@@ -96,14 +98,18 @@ public class CustomHandler extends Handler {
                 Log.i("Check", "parseRace");
                 TitleBarActivity.updateBatteryLvl((int) raceBuf[msg.arg1]);
                 TitleBarActivity.updateThreatIndicator((int) raceBuf[msg.arg1+1]);
-                RaceActivity.parseData(Arrays.copyOfRange(raceBuf, msg.arg1+2, msg.arg2));
+                TitleBarActivity.updateChargeStatus((int) raceBuf[msg.arg1+2]);
+                //Log.i("BLVL", Integer.toString(blvl2));
+                Log.i("Check", "parseData");
+                RaceActivity.parseData(Arrays.copyOfRange(raceBuf, msg.arg1+3, msg.arg2));
                 break;
             case Constants.XB_CONNECT:
                 byte[] xbBuf = (byte[]) msg.obj;
                 Log.d("threat", Integer.toString((int) xbBuf[msg.arg1+1]));
                 TitleBarActivity.updateBatteryLvl((int) xbBuf[msg.arg1]);
                 TitleBarActivity.updateThreatIndicator((int) xbBuf[msg.arg1+1]);
-                Globals.sMyTRIOid = new String(Arrays.copyOfRange(xbBuf, msg.arg1+2, msg.arg2));
+                TitleBarActivity.updateThreatIndicator((int) xbBuf[msg.arg1+2]);
+                Globals.sMyTRIOid = new String(Arrays.copyOfRange(xbBuf, msg.arg1+3, msg.arg2));
                 Log.d("xb", Globals.sMyTRIOid);
                 Globals.editor.putString("my_trio_id", Globals.sMyTRIOid);
                 Globals.editor.apply();

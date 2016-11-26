@@ -32,9 +32,10 @@ import java.util.TimeZone;
 public class RaceActivity extends TitleBarActivity implements View.OnClickListener {
     ToggleButton tbSession;
     Button btTest;
-    static TextView tvMetric0, tvMetric1, tvMetric2, tvMetric3;
+    static TextView tvMetric0, tvMetric1, tvMetric2, tvMetric3, tvPlace;
     static TextView tvLabel0, tvLabel1, tvLabel2, tvLabel3;
     private static Context sContext;
+    protected static int place = 1;
 
     //Declare some variables
     static boolean autoScrollX;
@@ -100,6 +101,7 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
         tvMetric1 = (TextView) findViewById(R.id.tvMetric1);
         tvMetric2 = (TextView) findViewById(R.id.tvMetric2);
         tvMetric3 = (TextView) findViewById(R.id.tvMetric3);
+        tvPlace = (TextView) findViewById(R.id.tvPlace);
         btTest = (Button) findViewById(R.id.btTest);
         btTest.setOnClickListener(this);
         tbSession = (ToggleButton) findViewById(R.id.tbSession);
@@ -233,6 +235,7 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
 
         toParse = setText0+","+setText1+","+setText2+
                 ","+setText3;
+        updatePlace(byteArray[26]);
         Globals.sBuffer = (toParse+"\n").getBytes(StandardCharsets.UTF_8);
         Log.i("pData", toParse);
         Globals.sNewData = true;
@@ -290,6 +293,27 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
 
     public String makeFileName(String date, int session){
         return date+"-"+Integer.toString(session)+".csv";
+    }
+
+    public static void updatePlace(int val){
+        final int x = val;
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                if(x == 1){
+                    if(place == 2){
+                        place = 1;
+                        tvPlace.setText(Integer.toString(place));
+                    }
+                } else {
+                    if(place == 1){
+                        place = 2;
+                        tvPlace.setText(Integer.toString(place));
+                    }
+                }
+            }
+        };
+        runOnUI(r);
     }
 
     @Override

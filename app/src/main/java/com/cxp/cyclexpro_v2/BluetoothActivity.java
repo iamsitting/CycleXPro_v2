@@ -424,8 +424,8 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                 try {
 
                     Log.d("Deb", "Reading...");
-                    dinput.readFully(buffer, 0, 32);
-                    Log.d("dinput", Globals.getHexString(buffer, 32));
+                    dinput.readFully(buffer, 0, 40);
+                    Log.d("dinput", Globals.getHexString(buffer, 40));
 
                     //bytes += mmInStream.read(buffer, bytes, buffer.length - bytes);
                     //bytes += buffer.length;
@@ -434,10 +434,11 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                         if ((buffer[0] & 0xFF) == 0xA7) {
                             switch (buffer[1]) {
                                 case Constants.IDLE_READ:
-                                    length = 9;
+                                    length = 10;
                                     break;
+                                case Constants.COACH_READ:
                                 case Constants.DATA_READ:
-                                    length = 22;
+                                    length = 23;
                                     break;
                                 case Constants.HEADER_READ:
                                     length = 30;
@@ -446,8 +447,11 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                     length = 10;
                                     break;
                                 case Constants.RACE_READ:
-                                    length = 30;
+                                    length = 32;
                                     break;
+                                //case Constants.COACH_READ:
+                                    //length = 17;
+                                    //break;
                                 case Constants.XB_CONNECT:
                                     length = 12;
                                     break;
@@ -484,6 +488,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                             break;
                                         case Constants.XB_CONNECT:
                                             runOnUI(progDismiss);
+                                        case Constants.COACH_READ:
                                         case Constants.DATA_READ:
                                         case Constants.IDLE_READ:
                                         case Constants.RACE_READ:
