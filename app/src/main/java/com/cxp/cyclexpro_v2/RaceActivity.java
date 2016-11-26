@@ -235,13 +235,13 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
 
         toParse = setText0+","+setText1+","+setText2+
                 ","+setText3;
-        updatePlace(byteArray[26]);
+
         Globals.sBuffer = (toParse+"\n").getBytes(StandardCharsets.UTF_8);
-        Log.i("pData", toParse);
+        Log.d("raceData", toParse+","+setText4+","+setText5);
         Globals.sNewData = true;
 
-        tvMetric0.setText(setText0);
-        tvMetric1.setText(setText1);
+        tvMetric0.setText(setText1);
+        tvMetric1.setText(setText2);
         tvMetric2.setText(setText4);
         tvMetric3.setText(setText5);
 

@@ -50,13 +50,10 @@ public class CustomHandler extends Handler {
                 break;
             case Constants.IDLE_READ:
                 byte[] idleBuf = (byte[]) msg.obj;
-
-                //int blvl = idleBuf[msg.arg1];
                 Log.d("threat", Integer.toString((int) idleBuf[msg.arg1+1]));
                 TitleBarActivity.updateBatteryLvl((int) idleBuf[msg.arg1]);
                 TitleBarActivity.updateThreatIndicator((int) idleBuf[msg.arg1+1]);
                 TitleBarActivity.updateChargeStatus((int) idleBuf[msg.arg1+2]);
-                //Log.i("BLVL", Integer.toString(blvl));
                 break;
             case Constants.COACH_READ:
             case Constants.DATA_READ:
@@ -99,9 +96,10 @@ public class CustomHandler extends Handler {
                 TitleBarActivity.updateBatteryLvl((int) raceBuf[msg.arg1]);
                 TitleBarActivity.updateThreatIndicator((int) raceBuf[msg.arg1+1]);
                 TitleBarActivity.updateChargeStatus((int) raceBuf[msg.arg1+2]);
+                RaceActivity.updatePlace((int) raceBuf[msg.arg1+3]);
                 //Log.i("BLVL", Integer.toString(blvl2));
                 Log.i("Check", "parseData");
-                RaceActivity.parseData(Arrays.copyOfRange(raceBuf, msg.arg1+3, msg.arg2));
+                RaceActivity.parseData(Arrays.copyOfRange(raceBuf, msg.arg1+4, msg.arg2));
                 break;
             case Constants.XB_CONNECT:
                 byte[] xbBuf = (byte[]) msg.obj;
