@@ -6,9 +6,13 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.7.3
+2.7.4
 
 ### Most Recent Changes
+
+2.7.4
+- Tested Incident Outreach
+- bugfix: UI in TitleBar
 
 2.7.3
 - Bugfix: Displaying wrong data on Race Activity

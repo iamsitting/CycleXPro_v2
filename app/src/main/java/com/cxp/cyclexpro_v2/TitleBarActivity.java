@@ -74,17 +74,25 @@ public class TitleBarActivity extends Activity {
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvBatteryLevel = (TextView) findViewById(R.id.tvBatteryLevel);
         tvThreatIndicator = (TextView) findViewById(R.id.tvThreatIndicator);
-        updateConBtn();
-
         btMenu = (Button) findViewById(R.id.btMenu);
+
+        updateConBtn();
         updateThreatIndicator(0);
         threatOn = false;
+        updateChargeStatus(0);
+        chargeOn = false;
+        updateBatteryLvl(0);
     }
 
     @Override
     protected void onResume(){
         super.onResume();
         updateConBtn();
+        updateThreatIndicator(0);
+        threatOn = false;
+        updateChargeStatus(0);
+        chargeOn = false;
+        updateBatteryLvl(0);
     }
 
     /*

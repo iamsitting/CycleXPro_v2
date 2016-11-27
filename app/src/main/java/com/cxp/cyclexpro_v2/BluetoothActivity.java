@@ -445,7 +445,7 @@ public class BluetoothActivity extends TitleBarActivity implements AdapterView.O
                                     length = 30;
                                     break;
                                 case Constants.ERPS_READ:
-                                    length = 10;
+                                    length = 11;
                                     break;
                                 case Constants.RACE_READ:
                                     length = 32;

@@ -36,6 +36,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -88,6 +89,10 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
     String savedDate;
     int savedSession;
 
+    private static String toSend;
+    public static Runnable erpsRunnable;
+    public static AlertDialog.Builder erpsDialog;
+
 
 
     @Override
@@ -104,6 +109,7 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     /** initializes graphView object */
     void init(){
+        toSend = "http://maps.google.com/maps?q=0,0";
         Bundle extras = getIntent().getExtras();
         String mode = extras.getString("Mode");
 
@@ -145,6 +151,30 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
                 Constants.DATE_NOT_EXISTS);
         savedSession = Globals.memory.getInt(Constants.PREFS_KEY_SESSION,
                 Constants.SESH_NOT_EXISTS);
+
+        //Runnable
+        erpsDialog = new AlertDialog.Builder(this)
+                .setTitle("Cyclist is an accident!!")
+                .setMessage("What do you want to do?")
+                .setPositiveButton("Go to Map", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which){
+                        BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
+                        goToMap();
+                    }
+                })
+                .setNegativeButton("Ignore", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which){
+                        BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
+                    }
+                });
+        erpsRunnable = new Runnable() {
+            @Override
+            public void run() {
+                erpsDialog.show();
+            }
+        };
     }
 
     /** initializes View objects */
@@ -354,6 +384,22 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
         sContext.startActivity(intent);
     }
 
+    public static void launchWarning(byte[] byteArray){
+        float latitude = ByteBuffer.wrap(byteArray, 0, 4)
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
+        String lat = String.format("%.6f", latitude);
+
+        //Longitude
+        float longitude = ByteBuffer.wrap(byteArray, 4,4)
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
+        String longi = String.format("%.6f", longitude);
+
+        toSend = "http://maps.google.com/maps?q="
+                +lat
+                +","+longi;
+        runOnUI(erpsRunnable);
+    }
+
 
     public static void plotData(float value){
         Log.i("plotData", Float.toString(value));
@@ -364,6 +410,11 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
     public String makeFileName(String date, int session){
         return date+"-"+Integer.toString(session)+".csv";
+    }
+
+    public void goToMap(){
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(toSend));
+        startActivity(browserIntent);
     }
 
     @Override

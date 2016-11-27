@@ -80,12 +80,22 @@ public class CustomHandler extends Handler {
             case Constants.ERPS_READ:
                 byte[] erpsBuf = (byte[]) msg.obj;
                 Log.i("Check", "parseERPS");
-                if(Globals.sMode == Constants.MODE_RACE){
-                    RaceActivity.launchERPS(Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
+                int oppERPS = (int) erpsBuf[msg.arg1];
+                if(oppERPS == 0){
+                    if(Globals.sMode == Constants.MODE_RACE){
+                        RaceActivity.launchERPS(Arrays.copyOfRange(erpsBuf, msg.arg1+1, msg.arg2));
+                    } else {
+                        MetricsActivity.launchERPS( Arrays.copyOfRange(erpsBuf, msg.arg1+1, msg.arg2));
+                    }
+                    Log.d("DEB","launching ERPS" );
                 } else {
-                    MetricsActivity.launchERPS( Arrays.copyOfRange(erpsBuf, msg.arg1, msg.arg2));
+                    if(Globals.sMode == Constants.MODE_RACE){
+                        RaceActivity.launchWarning(Arrays.copyOfRange(erpsBuf, msg.arg1+1, msg.arg2));
+                    } else {
+                        MetricsActivity.launchWarning(Arrays.copyOfRange(erpsBuf, msg.arg1+1, msg.arg2));
+                    }
+                    Log.d("DEB","launching ERPS" );
                 }
-                Log.d("DEB","launching ERPS" );
                 break;
             case Constants.RACE_READ:
                 byte[] raceBuf = (byte[]) msg.obj;

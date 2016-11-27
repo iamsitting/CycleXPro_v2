@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -50,6 +51,10 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
     String savedDate;
     int savedSession;
 
+    private static String toSend;
+    public static Runnable erpsRunnable;
+    public static AlertDialog.Builder erpsDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +93,31 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
                 Constants.DATE_NOT_EXISTS);
         savedSession = Globals.memory.getInt(Constants.PREFS_KEY_SESSION,
                 Constants.SESH_NOT_EXISTS);
+
+        //Runnable
+        toSend = "http://maps.google.com/maps?q=0,0";
+        erpsDialog = new AlertDialog.Builder(this)
+                .setTitle("Cyclist is an accident!!")
+                .setMessage("What do you want to do?")
+                .setPositiveButton("Go to Map", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which){
+                        BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
+                        goToMap();
+                    }
+                })
+                .setNegativeButton("Ignore", new DialogInterface.OnClickListener(){
+                    @Override
+                    public void onClick(DialogInterface dialog, int which){
+                        BluetoothActivity.sConnectedThread.write(Constants.END_SESSION);
+                    }
+                });
+        erpsRunnable = new Runnable() {
+            @Override
+            public void run() {
+                erpsDialog.show();
+            }
+        };
     }
 
     /** initializes View objects */
@@ -314,6 +344,27 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
             }
         };
         runOnUI(r);
+    }
+
+    public static void launchWarning(byte[] byteArray){
+        float latitude = ByteBuffer.wrap(byteArray, 0, 4)
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
+        String lat = String.format("%.6f", latitude);
+
+        //Longitude
+        float longitude = ByteBuffer.wrap(byteArray, 4,4)
+                .order(ByteOrder.BIG_ENDIAN).getFloat();
+        String longi = String.format("%.6f", longitude);
+
+        toSend = "http://maps.google.com/maps?q="
+                +lat
+                +","+longi;
+        runOnUI(erpsRunnable);
+    }
+
+    public void goToMap(){
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(toSend));
+        startActivity(browserIntent);
     }
 
     @Override
