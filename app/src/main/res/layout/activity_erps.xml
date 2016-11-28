@@ -37,8 +37,7 @@
             android:text="20"
             android:textSize="60dp"
             android:background="@color/colorPrimaryDark"
-            android:textColor="@color/white"
-            android:maxLength="4"/>
+            android:textColor="@color/white"/>
 
     </LinearLayout>
 

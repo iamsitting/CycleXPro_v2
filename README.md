@@ -6,9 +6,12 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.7.5
+2.7.6
 
 ### Most Recent Changes
+
+2.7.6
+- ERPS UI bugfix
 
 2.7.5
 - Graphview Line Thickness and Color Change

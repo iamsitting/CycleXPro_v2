@@ -98,7 +98,6 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
     }
 
     public class CustomCountDownTimer extends CountDownTimer {
-        //TODO: Timer untested
         public CustomCountDownTimer(long lstartTime, long linterval) {
             super(lstartTime, linterval);
         }
@@ -107,6 +106,7 @@ public class ERPSActivity extends TitleBarActivity implements View.OnClickListen
         public void onFinish() {
             timerFinished = true;
             tvTimer.setText("Activated!");
+            tvTimer.setTextSize(40);
 
             Log.d("H_array", Globals.getHexString(byteArray, byteArray.length));
 
