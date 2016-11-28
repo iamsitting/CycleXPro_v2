@@ -71,8 +71,10 @@ public class RaceActivity extends TitleBarActivity implements View.OnClickListen
         GraphView graph = (GraphView) findViewById(R.id.graph);
         mSeries = new LineGraphSeries<>();
         mSeries.setColor(Color.GREEN);
+        mSeries.setThickness(15);
         mOppSeries = new LineGraphSeries<>();
         mOppSeries.setColor(Color.RED);
+        mOppSeries.setThickness(15);
         graph.addSeries(mSeries);
         graph.addSeries(mOppSeries);
 

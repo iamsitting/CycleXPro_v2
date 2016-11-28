@@ -36,6 +36,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -132,6 +133,8 @@ public class MetricsActivity extends TitleBarActivity implements View.OnClickLis
 
         GraphView graph = (GraphView) findViewById(R.id.graph);
         mSeries = new LineGraphSeries<>();
+        mSeries.setColor(Color.YELLOW);
+        mSeries.setThickness(15);
         graph.addSeries(mSeries);
 
         //X-Axis

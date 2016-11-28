@@ -6,9 +6,12 @@ This project contains the Android application for the Cycle X-Pro. This project 
 
 ### Version
 
-2.7.4
+2.7.5
 
 ### Most Recent Changes
+
+2.7.5
+- Graphview Line Thickness and Color Change
 
 2.7.4
 - Tested Incident Outreach
